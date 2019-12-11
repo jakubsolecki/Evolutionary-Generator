@@ -51,6 +51,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         //potem dodoam dynamiczne obliczanie skrajnych wektorow dzungli oraz jej "skalowanie" (przesuwanie na srodek)
     }
 
+    @Override
     public void positionChanged(Vector2D oldPosition, Vector2D newPosition){
         Animal pet = animals.get(oldPosition);
         animals.remove(oldPosition);

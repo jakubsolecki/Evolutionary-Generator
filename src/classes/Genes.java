@@ -62,5 +62,5 @@ public class Genes {
         Arrays.sort(genes);
     }
 
-    public int randomGenes()
+    //public int randomGenes()
 }
