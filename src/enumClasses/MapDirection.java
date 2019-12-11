@@ -1,4 +1,5 @@
-package main;
+package enumClasses;
+import classes.Vector2D;
 
 public enum MapDirection {
     N, NE, E, SE, S, SW, W, NW;
@@ -19,8 +20,10 @@ public enum MapDirection {
             return "SW";
         else if(directions == W)
             return "W";
-        else //if(direction == NW)
+        else if(directions == NW)
             return "NW";
+        else
+            return null;
     }
 
     public static MapDirection next(MapDirection t){
@@ -45,49 +48,50 @@ public enum MapDirection {
         return n;
     }
 
-    public static MapDirection prevoius(MapDirection t){
-        MapDirection n = t;
+    public static MapDirection previous(MapDirection t){
+        //MapDirection n = t;
         switch(t){
             case N:
-                n = NW;
-                break;
+                return NW;
             case NE:
-                n = N;
-                break;
+                return N;
             case E:
-                n = NE;
-                break;
+                return NE;
             case SE:
-                n = E;
-                break;
+                return E;
             case S:
-                n = SE;
-                break;
+                return SE;
             case SW:
-                n = S;
-                break;
+                return S;
             case W:
-                n = SW;
-                break;
+                return SW;
             case NW:
-                n = W;
-                break;
+                return W;
         }
-        return n;
+        return null;
     }
 
-    /*public static Vector2D toUnitVector(MapDirection t){
+    public static Vector2D toUnitVector(MapDirection t){
         switch(t){
             case N:
-                return new Vector2d(0,1);
-            case SOUTH:
-                return new Vector2d(0,-1);
-            case EAST:
-                return new Vector2d(1,0);
-            case WEST:
-                return new Vector2d(-1,0);
+                return new Vector2D(0,1);
+            case NE:
+                return new Vector2D(1,1);
+            case E:
+                return new Vector2D(1,0);
+            case SE:
+                return new Vector2D(1,-1);
+            case S:
+                return new Vector2D(0, -1);
+            case SW:
+                return new Vector2D(-1, -1);
+            case W:
+                return new Vector2D(-1, 0);
+            case NW:
+                return new Vector2D(-1,1);
+            default:
+                return new Vector2D(0,0);
         }
-        return new Vector2d(0,0);
-    }*/
+    }
 
 }
