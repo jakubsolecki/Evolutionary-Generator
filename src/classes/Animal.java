@@ -8,7 +8,7 @@ import interfaces.*;
 
 import static enumClasses.MapDirection.*;
 
-public class Animal {
+public class Animal implements IWorldMapElement{
     private Genes genes;
     private Vector2D position;
     private int energy;
@@ -21,6 +21,11 @@ public class Animal {
         direction = facing;
         energy = startEnergy;
         genes = new Genes(32, 8);
+    }
+
+    @Override
+    public boolean isMovable(){
+        return true;
     }
 
     public Vector2D getPosition() {
@@ -71,7 +76,7 @@ public class Animal {
 
     }
 
-    void addObserver(IPositionChangeObserver observer){
+    public void addObserver(IPositionChangeObserver observer){
         observers.add(observer);
     }
 

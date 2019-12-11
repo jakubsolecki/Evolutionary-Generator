@@ -1,4 +1,5 @@
 package world;
+import enumClasses.MoveDirection;
 import interfaces.*;
 import classes.*;
 import classes.Animal;
@@ -6,7 +7,7 @@ import classes.Animal;
 import java.util.*;
 
 public class WorldMap implements IWorldMap, IPositionChangeObserver{
-    //map size
+    //map properties
     private Vector2D upperRight = new Vector2D(39,39);
     private Vector2D lowerLeft = new Vector2D(0,0);
     private Vector2D jungleUpperRight = new Vector2D(24,24);
@@ -22,10 +23,11 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     private int startEnergy;
     private int copulationEnergyLowerLimit;
 
+    //storing elements on map
     private Map<Vector2D, Grass> grass = new HashMap<>();
     private Map<Vector2D, LinkedList<Animal>> animals = new HashMap<>();
-    public LinkedList<Animal> animalList;
-    public LinkedList<Grass> grassList;
+    private List<Animal> animalList;
+    private List<Grass> grassList;
 
     public WorldMap(/*int width, int height, int jungleWidth, int jungleHeight,*/ int grassEnergy, int dayCost, int initialEnergy, int copulationEnergy){
         //map attributes
@@ -37,8 +39,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         this.energyDayDrain = (-1) * dayCost;
         startEnergy = initialEnergy;
         copulationEnergyLowerLimit = copulationEnergy;
-        grassList = new LinkedList<>();
-        animalList = new LinkedList<>();
+        grassList = new ArrayList<>();
+        animalList = new ArrayList<>();
         //this.jungeWidth = jungleWidth;
         //this.jungleHeight = jungleHeight;
 
@@ -48,60 +50,77 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         int jux = width - 1;
         int juy = height - 1;*/
 
-        //potem dodoam dynamiczne obliczanie skrajnych wektorow dzungli oraz jej "skalowanie" (przesuwanie na srodek)
+        //dynamic jungle moving to the center will be added later
     }
 
-    @Override
-    public void positionChanged(Vector2D oldPosition, Vector2D newPosition){
-        Animal pet = animals.get(oldPosition);
-        animals.remove(oldPosition);
-        animals.put(newPosition, pet);
+    private Vector2D posCurve(Vector2D position){ //allows Animals to feel like on the globe
+        int newX;
+        int newY;
+
+        if(position.x < lowerLeft.x)
+            newX = (width - Math.abs(position.x % width)) % width;
+        else
+            newX = position.x % width;
+
+        if(position.y < lowerLeft.y)
+            newY = (height - Math.abs(position.y % width)) % width;
+        else
+            newY = position.y % width;
+
+        return new Vector2D(newX, newY);
     }
 
+    public boolean place(IWorldMapElement entity) {
+        Vector2D position = posCurve(entity.getPosition());
 
-    public boolean canMoveTo(Vector2D position){
+        if(!canBePlaced(position))
+            throw new IllegalArgumentException("Field" + position.toString() + "is already full");
+
+        if(entity instanceof Animal){
+            addAnimal((Animal) entity, position);
+            animalList.add((Animal) entity);
+            entity.addObserver(this);
+        }
+
+        if(entity instanceof Grass){
+            if(grass.get(position) == null)
+                grass.put(position, (Grass) entity);
+            grassList.add((Grass) entity);
+        }
+
+        return true;
+    }
+
+    private boolean canBePlaced(Vector2D position){
+        Vector2D mapPosition = posCurve(position);
+
+        if(animals.get(position) == null)
+            return true;
+
+        return animals.get(position).size() < 2;
+    }
+
+    public boolean canMoveTo(Vector2D position){ //has to be checked
         if(animals.containsKey(position))
             return false;
         else return !(isOccupied(position));
     }
 
-
-    /*public String toString() {
-        MapVisualizer mapVisualization = new MapVisualizer(this);
-        return mapVisualization.draw(this.lowerLeft, this.upperRight);
-    }*/
-
-
-    public boolean place(Animal animal) {
-        Vector2D pos = animal.getPosition();
-        if (!isOccupied(pos)) {
-            animals.put(animal.getPosition(), animal);
-            animal.addObserver(this);
-            animalList.add(animal);
-
-            return true;
-        }
-        else throw new IllegalArgumentException(animal.getPosition().toString() + " Given position is already occupied!");
-    }
-
-
     public boolean isOccupied(Vector2D position) {
-        return animals.get(position) != null;
+        return animals.get(position) != null; //??
     }
 
+    private void addAnimal(Animal animal, Vector2D position){
+        //will be added later
+    }
 
-    /*public void run(MoveDirection[] directions) {
-        int i = 0;
-        for(MoveDirection direction : directions) {
-            Animal tmpAnimal = animalList.get(i % animalList.size());
-            Vector2d hashKey = tmpAnimal.getPosition();
-            animals.remove(hashKey);
-            tmpAnimal.move(direction);
-            animals.put(tmpAnimal.getPosition(), tmpAnimal);
-            i++;
-        }
-    }*/
+    public void run(MoveDirection[] directions){
+        //will be added later
+    }
 
+    public void positionChanged(Vector2D oldPosition, Vector2D newPosition){
+        //Animal pet = animals.get
+    }
 
     public Object objectAt(Vector2D position) {
         return animals.get(position);

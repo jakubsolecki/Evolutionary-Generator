@@ -1,6 +1,9 @@
 package classes;
 
-public class Grass {
+import interfaces.IPositionChangeObserver;
+import interfaces.IWorldMapElement;
+
+public class Grass implements IWorldMapElement {
     private Vector2D position;
     private int energy; //is it necessary?
 
@@ -21,5 +24,8 @@ public class Grass {
         return "*";
     }
 
+    public void addObserver(IPositionChangeObserver observer){
+        return;
+    }
 
 }
