@@ -1,4 +1,5 @@
 package world;
+import enumClasses.MapDirection;
 import enumClasses.MoveDirection;
 import interfaces.*;
 import classes.*;
@@ -8,14 +9,15 @@ import java.util.*;
 
 public class WorldMap implements IWorldMap, IPositionChangeObserver{
     //map properties
-    private Vector2D upperRight = new Vector2D(39,39);
-    private Vector2D lowerLeft = new Vector2D(0,0);
-    private Vector2D jungleUpperRight = new Vector2D(24,24);
-    private Vector2D jungleLowerLeft = new Vector2D(14,14);
-    private int jungeWidth = 10;
-    private int jungleHeight = 10;
-    private int width = 40;
-    private int height = 40;
+    private Vector2D upperRight;
+    private Vector2D lowerLeft;
+    private Vector2D jungleUpperRight;
+    private Vector2D jungleLowerLeft;
+    private int jungleWidth ;
+    private int jungleHeight;
+    private int width;
+    private int height;
+
 
     //living
     private int grassEnergy;
@@ -23,37 +25,58 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     private int startEnergy;
     private int copulationEnergyLowerLimit;
 
+
     //storing elements on map
     private Map<Vector2D, Grass> grass = new HashMap<>();
     private Map<Vector2D, LinkedList<Animal>> animals = new HashMap<>();
-    private List<Animal> animalList;
-    private List<Grass> grassList;
+    private LinkedList<Animal> animalList;
+    private LinkedList<Grass> grassList;
 
-    public WorldMap(/*int width, int height, int jungleWidth, int jungleHeight,*/ int grassEnergy, int dayCost, int initialEnergy, int copulationEnergy){
-        //map attributes
-        //this.width = width;
-        //this.height = height;
-        //lowerLeft = new Vector2D(0,0);
-        //upperRight = new Vector2D(width - 1, height - 1);
+
+    public WorldMap(int width, int height, int jungleWidth, int jungleHeight, int grassEnergy, int dayCost, int initialEnergy, int copulationEnergy){
+        // map attributes
+        this.width = width;
+        this.height = height;
+        lowerLeft = new Vector2D(0,0);
+        upperRight = new Vector2D(width - 1, height - 1);
         this.grassEnergy = grassEnergy;
         this.energyDayDrain = (-1) * dayCost;
         startEnergy = initialEnergy;
         copulationEnergyLowerLimit = copulationEnergy;
-        grassList = new ArrayList<>();
-        animalList = new ArrayList<>();
-        //this.jungeWidth = jungleWidth;
-        //this.jungleHeight = jungleHeight;
+        grassList = new LinkedList<>();
+        animalList = new LinkedList<>();
+        this.jungleWidth = jungleWidth;
+        this.jungleHeight = jungleHeight;
 
         //jungle
-        /*int jly = 0;
+        int jly = 0;
         int jlx = 0;
         int jux = width - 1;
-        int juy = height - 1;*/
+        int juy = height - 1;
 
-        //dynamic jungle moving to the center will be added later
+        //dynamic jungle moving to the center
+        for (int i = 0; i < (width - jungleWidth); i++) {
+            if (i % 2 == 0) {
+                jlx++;
+            } else {
+                jux--;
+            }
+        }
+
+        for (int i = 0; i < (height - jungleHeight); i++) {
+            if (i % 2 == 0) {
+                jly++;
+            } else {
+                juy--;
+            }
+        }
+
+        this.jungleLowerLeft = new Vector2D(jlx, jly);
+        this.jungleUpperRight = new Vector2D(jux, jux);
     }
 
-    private Vector2D posCurve(Vector2D position){ //allows Animals to feel like on the globe
+
+    private Vector2D posCurve(Vector2D position){ //"connects" opposite edges
         int newX;
         int newY;
 
@@ -69,6 +92,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
 
         return new Vector2D(newX, newY);
     }
+
 
     public boolean place(IWorldMapElement entity) {
         Vector2D position = posCurve(entity.getPosition());
@@ -91,39 +115,204 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         return true;
     }
 
+
     private boolean canBePlaced(Vector2D position){
         Vector2D mapPosition = posCurve(position);
 
-        if(animals.get(position) == null)
+        if(animals.get(mapPosition) == null)
             return true;
 
-        return animals.get(position).size() < 2;
+        return animals.get(mapPosition).size() < 3;
     }
 
-    public boolean canMoveTo(Vector2D position){ //has to be checked
-        if(animals.containsKey(position))
-            return false;
-        else return !(isOccupied(position));
+
+    public boolean canMoveTo(Vector2D position){
+        Vector2D mapPosition = posCurve(position);
+
+        if(animals.get(mapPosition) == null)
+            return true;
+
+        return animals.get(mapPosition).size() < 2;
     }
 
-    public boolean isOccupied(Vector2D position) {
+
+    /*public boolean isOccupied(Vector2D position) {
         return animals.get(position) != null; //??
+    }*/
+
+
+    public void moveRandomAllAnimals() {
+        LinkedList<Animal> l = animalList;
+        for (int i = 0; i < l.size(); i++) {
+            animalList.get(i).rotate();
+            animalList.get(i).move(MoveDirection.FORWARD);
+        }
     }
+
+
+    public void copulation() {
+        for (LinkedList<Animal> animalList : animals.values()) {
+            if (animalList != null) {
+                if (animalList.size() == 2) {
+                    Animal parent1 = animalList.get(0);
+                    Animal parent2 = animalList.get(1);
+                    if (parent1.getEnergy() > copulationEnergyLowerLimit)
+                        if (parent2.getEnergy() > copulationEnergyLowerLimit) {
+                            Animal child = parent2.copulation(parent1);
+                            place(child);
+                        }//statistic to end
+                }
+            }
+        }
+    }
+
+
+    /*public Vector2D placeToBirth(Vector2D position){
+        for(MapDirection i : MapDirection.values()){
+            Vector2D birthPos = posCurve(MapDirection.toUnitVector(i).add(position));
+            if(canBePlaced(birthPos));
+                return birthPos;
+        }
+        return
+    }*/
+
+
+    public void nextDay() {
+        for (LinkedList<Animal> animalList : animals.values()) {
+            if (animalList != null) {
+                if (animalList.size() > 0) {
+                    for (Animal a : animalList) {
+                        a.changeEnergy(energyDayDrain);
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeDeadAnimals() {
+        LinkedList<Animal> l = animalList;
+        for (int i = 0; i < l.size(); i++) {
+            Animal a = animalList.get(i);
+            if (a.isDead()) {
+                removeAnimal(a, a.getPosition());
+                a.removeObserver(this);
+                animalList.remove(a);
+            }
+        }
+    }
+
+    public boolean addAnimalOnRandomField() {
+
+        int toMuchTimes = 0;
+        while (toMuchTimes < width * height * 2) {
+            Vector2D position = new Vector2D((int) (Math.random() * (width) + lowerLeft.x), (int) (Math.random() * (height) + lowerLeft.y));
+            if (canBePlaced(position)) {
+                place(new Animal( position, startEnergy, this));
+                return true;
+            }
+            toMuchTimes++;
+        }
+        return false;
+    }
+
+    public boolean placeAnimalToRandomFieldInJungle() {
+        int jungleSize = jungleWidth * jungleHeight;
+        int mapSize = height * width;
+        int steppeSize = mapSize - jungleSize;
+
+        int toMuchTimes = 0;
+        while ((double) toMuchTimes < (double) 2 * ((double) jungleSize / (double) steppeSize) * mapSize) {
+
+            Vector2D position = new Vector2D((int) (Math.random() * (jungleWidth) + jungleLowerLeft.x), (int) (Math.random() * (jungleHeight) + jungleLowerLeft.y));
+            if (canBePlaced(position)) {
+                place(new Animal(position, startEnergy, this));
+                return true;
+            }
+            toMuchTimes++;
+        }
+        return false;
+    }
+
 
     private void addAnimal(Animal animal, Vector2D position){
-        //will be added later
+        if(animal == null)
+            return;
+        Vector2D mapPos = posCurve(position);
+        LinkedList<Animal> list = animals.get(mapPos);
+        if(list == null) {
+            LinkedList<Animal> tmp = new LinkedList<>();
+            tmp.add(animal);
+            animals.put(mapPos, tmp);
+        }
+        else // if(list != null)
+            list.add(animal);
     }
 
-    public void run(MoveDirection[] directions){
-        //will be added later
+
+    private void removeAnimal(Animal animal, Vector2D position){
+        Vector2D mapPos = posCurve(position);
+        LinkedList<Animal> list = animals.get(mapPos);
+        if(list == null || list.size() == 0)
+            throw new IllegalArgumentException("Animal" + animal.getPosition() + "is not here");
+        else{
+            list.remove(animal);
+            if(list.size() == 0)
+                animals.remove(mapPos);
+        }
     }
 
-    public void positionChanged(Vector2D oldPosition, Vector2D newPosition){
-        //Animal pet = animals.get
-    }
 
     public Object objectAt(Vector2D position) {
-        return animals.get(position);
+        Vector2D mapPos = posCurve(position);
+        LinkedList<Animal> list = animals.get(mapPos);
+        if(list == null || list.size() == 0)
+            return grass.get(mapPos);
+        else return list.getFirst();
+    }
+
+
+    public void grandFeast(){
+        LinkedList<Grass> willBeEaten = new LinkedList<>();
+
+        for(Grass food : grass.values()){
+            LinkedList<Animal> eatingAnimals = animals.get(food.getPosition());
+
+            if(eatingAnimals != null && eatingAnimals.size() > 0){
+                int maxEnergy = 0;
+                int mightyAnimals = 0;
+
+                for(Animal a : eatingAnimals)
+                    if(a.getEnergy() > maxEnergy)
+                        maxEnergy = a.getEnergy();
+
+                for(Animal a : eatingAnimals)
+                    if(a.getEnergy() == maxEnergy)
+                        mightyAnimals++;
+
+                for(Animal a : eatingAnimals)
+                    if(a.getEnergy() == maxEnergy)
+                        a.changeEnergy(grassEnergy / mightyAnimals);
+            }
+            willBeEaten.add(food);
+        }
+        for(Grass g : willBeEaten){
+            grass.remove(g.getPosition());
+        }
+    }
+
+
+    public boolean positionChanged(Vector2D oldPosition2, Vector2D newPosition2, Object entity) {
+
+        Vector2D oldPosition = posCurve(oldPosition2);
+        Vector2D newPosition = posCurve(newPosition2);
+
+        if (canMoveTo(newPosition)) {
+
+            removeAnimal((Animal) entity, oldPosition);
+            addAnimal((Animal) entity, newPosition);
+            return true;
+        }
+        return false;
     }
 
 }

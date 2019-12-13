@@ -14,23 +14,48 @@ public class Animal implements IWorldMapElement{
     private int energy;
     private MapDirection direction;
     private Set<IPositionChangeObserver> observers = new HashSet<>();
+    private IWorldMap map;
 
 
-    public Animal(int x, int y, MapDirection facing, int startEnergy) {
-        position = new Vector2D(x, y);
-        direction = facing;
+    private Animal() {
+        this.direction = N;
+        genes = new Genes(32, 8);
+        position = new Vector2D(2, 2);
+    }
+
+    private Animal(IWorldMap map) {
+        this();
+        this.map = map;
+    }
+
+    private Animal(IWorldMap map, Vector2D initialPosition) {
+        this(map);
+        this.position = initialPosition;
+    }
+
+
+    public Animal(Vector2D initialPosition, int startEnergy, IWorldMap map) {
+        this(map, initialPosition);
         energy = startEnergy;
         genes = new Genes(32, 8);
     }
+
 
     @Override
     public boolean isMovable(){
         return true;
     }
 
+
     public Vector2D getPosition() {
         return new Vector2D(position.x, position.y);
     }
+
+
+    public int getEnergy(){
+        return energy;
+    }
+
 
     public void changeEnergy(int changeEnergy){
         energy += changeEnergy;
@@ -38,13 +63,16 @@ public class Animal implements IWorldMapElement{
             energy = 0;
     }
 
+
     public boolean isDead(){
         return energy == 0;
     }
 
+
     public Genes getGenes(){
         return genes;
     }
+
 
     public void move(MoveDirection toDirection) {
         Vector2D moved;
@@ -64,28 +92,49 @@ public class Animal implements IWorldMapElement{
                 break;
             case BACKWARD:
                 moved = this.position.subtract(toUnitVector(this.direction));
-                //if(map.canMoveTo(moved)){
-                //    positionChanged(moved);
-                this.position = moved;
-                //}
-                break;
+                if(map.canMoveTo(moved)) {
+                    //    positionChanged(moved);
+                    this.position = moved;
+                    //}
+                    break;
+                }
         }
     }
 
-    public void rotate(int degree){
 
+    public void rotate() {
+        int numOfRotation = genes.returnRandomGen();
+        for (int i = 0; i < numOfRotation; i++) {
+            this.move(MoveDirection.RIGHT);
+        }
     }
+
+
+    public Animal copulation(Animal mother) {
+
+        int childEnergy = (int) (0.25 * mother.energy) + (int) (this.energy * 0.25);
+        mother.changeEnergy((int) -(0.25 * mother.energy));
+        this.changeEnergy((int) -(this.energy * 0.25));
+
+        Animal child = new Animal( mother.getPosition(), childEnergy, map);
+        child.genes = new Genes(this.getGenes(), mother.getGenes());
+
+        return child;
+    }
+
 
     public void addObserver(IPositionChangeObserver observer){
         observers.add(observer);
     }
 
-    void removeObserver(IPositionChangeObserver observer){
+
+    public void removeObserver(IPositionChangeObserver observer){
         observers.remove(observer);
     }
 
+
     private void positionChanged(Vector2D newPosition){
         for(IPositionChangeObserver observer : observers)
-            observer.positionChanged(this.getPosition(), newPosition);
+            observer.positionChanged(this.getPosition(), newPosition, this);
     }
 }

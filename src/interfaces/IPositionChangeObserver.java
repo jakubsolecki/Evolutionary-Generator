@@ -3,5 +3,5 @@ import classes.*;
 
 public interface IPositionChangeObserver {
 
-    void positionChanged(Vector2D oldPosition, Vector2D newPosition);
+    boolean positionChanged(Vector2D oldPosition, Vector2D newPosition, Object entity);
     }
