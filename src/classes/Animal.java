@@ -85,10 +85,10 @@ public class Animal implements IWorldMapElement{
                 break;
             case FORWARD:
                 moved = this.position.add(toUnitVector(this.direction));
-                //if(map.canMoveTo(moved)){
-                //    positionChanged(moved);
+                if(map.canMoveTo(moved)){
+                    positionChanged(moved);
                 this.position = moved;
-                //}
+                }
                 break;
             case BACKWARD:
                 moved = this.position.subtract(toUnitVector(this.direction));
