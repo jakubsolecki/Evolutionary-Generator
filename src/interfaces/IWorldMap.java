@@ -28,4 +28,7 @@ public interface IWorldMap {
 
     boolean canMoveTo(Vector2D position);
 
+    boolean isOccupied(Vector2D currentPosition);
+
+    Vector2D posCurve(Vector2D toUnitVector);
 }

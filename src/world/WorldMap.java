@@ -4,6 +4,7 @@ import enumClasses.MoveDirection;
 import interfaces.*;
 import classes.*;
 import classes.Animal;
+import visualization.MapVisualizer;
 
 import java.util.*;
 
@@ -76,43 +77,31 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
-    private Vector2D posCurve(Vector2D position){ //"connects" opposite edges
+    public Vector2D posCurve(Vector2D position){ //"connects" opposite edges of the map
         int newX;
         int newY;
 
         if(position.x < lowerLeft.x)
             newX = (width - Math.abs(position.x % width)) % width;
         else
-            newX = position.x % width;
+            newX = Math.abs(position.x % width);
 
         if(position.y < lowerLeft.y)
-            newY = (height - Math.abs(position.y % width)) % width;
+            newY = (height - Math.abs(position.y % height) % height);
         else
-            newY = position.y % width;
+            newY = Math.abs(position.y % height);
+
+        if(position.x > upperRight.x)
+            newX = (width - Math.abs(position.x % width)) % width;
+        else
+            newX = Math.abs(position.x % width);
+
+        if(position.y > upperRight.y)
+            newY = (height - Math.abs(position.y % height) % height);
+        else
+            newY = Math.abs(position.y % height);
 
         return new Vector2D(newX, newY);
-    }
-
-
-    public boolean place(IWorldMapElement entity) {
-        Vector2D position = posCurve(entity.getPosition());
-
-        if(!canBePlaced(position))
-            throw new IllegalArgumentException("Field" + position.toString() + "is already full");
-
-        if(entity instanceof Animal){
-            addAnimal((Animal) entity, position);
-            animalList.add((Animal) entity);
-            entity.addObserver(this);
-        }
-
-        if(entity instanceof Grass){
-            if(grass.get(position) == null)
-                grass.put(position, (Grass) entity);
-            grassList.add((Grass) entity);
-        }
-
-        return true;
     }
 
 
@@ -136,9 +125,9 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
-    /*public boolean isOccupied(Vector2D position) {
-        return animals.get(position) != null; //??
-    }*/
+    public boolean isOccupied(Vector2D position) {
+        return objectAt(position) != null;
+    }
 
 
     public void moveRandomAllAnimals() {
@@ -234,6 +223,28 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
+    public boolean place(IWorldMapElement entity) {
+        Vector2D position = posCurve(entity.getPosition());
+
+        if(!canBePlaced(position))
+            throw new IllegalArgumentException("Field" + position.toString() + "is already full");
+
+        if(entity instanceof Animal){
+            addAnimal((Animal) entity, position);
+            animalList.add((Animal) entity);
+            entity.addObserver(this);
+        }
+
+        if(entity instanceof Grass){
+            if(grass.get(position) == null)
+                grass.put(position, (Grass) entity);
+            grassList.add((Grass) entity);
+        }
+
+        return true;
+    }
+
+
     private void addAnimal(Animal animal, Vector2D position){
         if(animal == null)
             return;
@@ -313,6 +324,12 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
             return true;
         }
         return false;
+    }
+
+    @Override
+    public String toString(){
+        MapVisualizer mapVisualization = new MapVisualizer(this);
+        return mapVisualization.draw(lowerLeft, upperRight);
     }
 
 }

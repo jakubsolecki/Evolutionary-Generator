@@ -5,7 +5,7 @@ public enum MapDirection {
     N, NE, E, SE, S, SW, W, NW;
 
     //@Override
-    public String toString(MapDirection directions){
+    public static String toString(MapDirection directions){
         if(directions == N)
             return "N";
         else if(directions == NE)
@@ -27,7 +27,7 @@ public enum MapDirection {
     }
 
     public static MapDirection next(MapDirection t){
-        MapDirection n = t;
+        MapDirection n;
         if(t == N)
             n = NE;
         else if(t == NE)

@@ -84,18 +84,18 @@ public class Animal implements IWorldMapElement{
                 this.direction = next(direction);
                 break;
             case FORWARD:
-                moved = this.position.add(toUnitVector(this.direction));
+                moved = this.position.add(map.posCurve(toUnitVector(this.direction)));
                 if(map.canMoveTo(moved)){
                     positionChanged(moved);
                 this.position = moved;
                 }
                 break;
             case BACKWARD:
-                moved = this.position.subtract(toUnitVector(this.direction));
+                moved = this.position.subtract(map.posCurve(toUnitVector(this.direction)));
                 if(map.canMoveTo(moved)) {
-                    //    positionChanged(moved);
+                    positionChanged(moved);
                     this.position = moved;
-                    //}
+
                     break;
                 }
         }
@@ -136,5 +136,10 @@ public class Animal implements IWorldMapElement{
     private void positionChanged(Vector2D newPosition){
         for(IPositionChangeObserver observer : observers)
             observer.positionChanged(this.getPosition(), newPosition, this);
+    }
+
+    @Override
+    public String toString() {
+        return energy == 0 ? "X" : "O"; //this.direction.toString();
     }
 }

@@ -15,17 +15,11 @@ public class Vector2D {
     }
 
     public boolean precedes(Vector2D other){
-        if(x <= other.x && y <= other.y)
-            return true;
-        else
-            return false;
+        return x <= other.x && y <= other.y;
     }
 
     public boolean follows(Vector2D other) {
-        if (x >= other.x && y >= other.y)
-            return true;
-        else
-            return false;
+        return x >= other.x && y >= other.y;
     }
 
     public Vector2D upperRight(Vector2D other){
@@ -55,9 +49,14 @@ public class Vector2D {
         if (!(other instanceof Vector2D))
             return false;
         Vector2D that = (Vector2D) other;
-        if(x == that.x && y == that.y)
-            return true;
-        else
-            return false;
+        return x == that.x && y == that.y;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 13;
+        hash += this.x * 31;
+        hash += this.y * 17;
+        return hash;
     }
 }
