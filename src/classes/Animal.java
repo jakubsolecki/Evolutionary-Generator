@@ -116,8 +116,8 @@ public class Animal implements IWorldMapElement{
         mother.changeEnergy((int) -(0.25 * mother.energy));
         this.changeEnergy((int) -(this.energy * 0.25));
 
-        Animal child = new Animal( mother.getPosition(), childEnergy, map);
-        child.genes = new Genes(this.getGenes(), mother.getGenes());
+        Animal child = new Animal(mother.getPosition(), childEnergy, map);
+        child.genes = new Genes(this.genes, mother.genes);
 
         return child;
     }

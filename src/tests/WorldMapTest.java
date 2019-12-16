@@ -2,11 +2,13 @@ package tests;
 
 import classes.Animal;
 import classes.Vector2D;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+// import org.junit.jupiter.api.Test;
 import world.WorldMap;
 import java.util.Arrays;
 import static enumClasses.MoveDirection.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
+// import static org.junit.jupiter.api.Assertions.assertTrue;
 import static java.lang.System.*;
 
 public class WorldMapTest {

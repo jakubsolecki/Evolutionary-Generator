@@ -149,6 +149,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
                         if (parent2.getEnergy() > copulationEnergyLowerLimit) {
                             Animal child = parent2.copulation(parent1);
                             place(child);
+                            //System.out.println(child.getGenes().toString());
                         }//statistic to end
                 }
             }
@@ -325,6 +326,45 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         }
         return false;
     }
+
+
+    public void spawnGrass() {
+
+        //For Jungle
+
+        int jungleSize = jungleWidth * jungleHeight;
+        int mapSize = height * width;
+        int steppeSize = mapSize - jungleSize;
+        int toMuchTimes = 0;
+        // stop looking for free place for grass in jungle, following to uniform probability distribution: after (size of jungle) times we should find free position
+        //but if we didn't we can stop and meaning that jungle fields are close to be full of grass.
+        while (toMuchTimes < 2 * jungleSize) {
+
+            //random position in jungle
+            Vector2D newGrass = new Vector2D((int) (Math.random() * (jungleWidth) + jungleLowerLeft.x), (int) (Math.random() * (jungleHeight) + jungleLowerLeft.y));
+            if (grass.get(newGrass) == null && canBePlaced(newGrass)) {
+                place(new Grass(newGrass));
+                break;
+            }
+            toMuchTimes++;
+        }
+
+        //For Steppe
+
+        toMuchTimes = 0;
+        // stop looking for free place for grass in steppe, following to uniform probability distribution: after (size of steppe) times we should find free position
+        //but if we didn't we can stop and be sure that steppe fields are close to be full of grass.
+        while ((double) toMuchTimes < (double) 2 * ((double) jungleSize / (double) steppeSize) * mapSize) {
+
+            Vector2D newGrass = new Vector2D((int) (Math.random() * (width) + lowerLeft.x), (int) (Math.random() * (height) + lowerLeft.y));
+            if (grass.get(newGrass) == null && canBePlaced(newGrass) && !(newGrass.follows(jungleLowerLeft) && newGrass.precedes(jungleUpperRight))) {
+                place(new Grass(newGrass));
+                break;
+            }
+            toMuchTimes++;
+        }
+    }
+    
 
     @Override
     public String toString(){

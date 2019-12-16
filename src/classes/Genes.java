@@ -30,7 +30,9 @@ public class Genes {
 
 
     public Genes(Genes g1, Genes g2) {
-        this(g1.getNumOfGenes(), g1.getSize());
+        this(g1.getSize(), g1.getNumOfGenes());
+        // this.numOfGenes = g1.getNumOfGenes();
+        // this.size = g1.getSize();
 
         if (g1.getSize() != g2.getSize()) throw new IllegalArgumentException("Gens have different sizes");
         if (g1.getNumOfGenes() != g2.getNumOfGenes())
@@ -71,7 +73,7 @@ public class Genes {
 
 
     public int getNumOfGenes(){
-        return numOfGenes;
+        return this.numOfGenes;
     }
 
 
@@ -84,28 +86,31 @@ public class Genes {
 
 
     private void checkGenes(){
-        boolean[] flags = new boolean[8];
+        // boolean[] flags = new boolean[8];
         //int[] counter = new int[8];
         boolean flag = true;
 
         while (flag) {
             flag = false;
+            boolean[] flags = new boolean[numOfGenes + 1];
             Arrays.fill(flags, false);
 
             for (int i = 0; i < size; i++)
-                flags[genes[i]] = true;
+                flags[this.genes[i]] = true;
+
+            // System.out.println(this.genes.toString());
 
             for (int i = 0; i < numOfGenes; i++) {
                 if (!flags[i]) {
                     flag = true;
-                    break;
+                   // break;
                 }
             }
 
             if(flag){
                 for(int i = 0; i < numOfGenes; i++){
                     if(!flags[i])
-                        genes[(int)(Math.random() * numOfGenes)] = i;
+                        genes[(int)(Math.random() * size)] = i;
                 }
             }
         }
