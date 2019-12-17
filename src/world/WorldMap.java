@@ -308,7 +308,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
             willBeEaten.add(food);
         }
         for(Grass g : willBeEaten){
-            grass.remove(g.getPosition());
+            grass.remove(g);
         }
     }
 
