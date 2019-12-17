@@ -2,6 +2,7 @@ package classes;
 import enumClasses.MoveDirection;
 import enumClasses.MapDirection;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 import interfaces.*;
@@ -11,7 +12,7 @@ import static enumClasses.MapDirection.*;
 public class Animal implements IWorldMapElement{
     private Genes genes;
     private Vector2D position;
-    private int energy;
+    private int energy;private int startEnergy;
     private MapDirection direction;
     private Set<IPositionChangeObserver> observers = new HashSet<>();
     private IWorldMap map;
@@ -34,9 +35,10 @@ public class Animal implements IWorldMapElement{
     }
 
 
-    public Animal(Vector2D initialPosition, int startEnergy, IWorldMap map) {
+    public Animal(Vector2D initialPosition, int energy, IWorldMap map) {
         this(map, initialPosition);
-        energy = startEnergy;
+        this.energy = energy;
+        this.startEnergy = energy;
         genes = new Genes(32, 8);
     }
 
@@ -141,5 +143,21 @@ public class Animal implements IWorldMapElement{
     @Override
     public String toString() {
         return energy == 0 ? "X" : "O"; //this.direction.toString();
+    }
+
+
+    public Color toColor() {
+        if (energy == 0) return new Color(222, 221, 224);
+        if (energy < 0.2 * startEnergy) return new Color(224, 179, 173);
+        if (energy < 0.4 * startEnergy) return new Color(224, 142, 127);
+        if (energy < 0.6 * startEnergy) return new Color(201, 124, 110);
+        if (energy < 0.8 * startEnergy) return new Color(182, 105, 91);
+        if (energy < startEnergy) return new Color(164, 92, 82);
+        if (energy < 2 * startEnergy) return new Color(146, 82, 73);
+        if (energy < 4 * startEnergy) return new Color(128, 72, 64);
+        if (energy < 6 * startEnergy) return new Color(119, 67, 59);
+        if (energy < 8 * startEnergy) return new Color(88, 50, 44);
+        if (energy < 10 * startEnergy) return new Color(74, 42, 37);
+        return new Color(55, 31, 27);
     }
 }

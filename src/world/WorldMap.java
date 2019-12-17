@@ -10,14 +10,14 @@ import java.util.*;
 
 public class WorldMap implements IWorldMap, IPositionChangeObserver{
     //map properties
-    private Vector2D upperRight;
-    private Vector2D lowerLeft;
-    private Vector2D jungleUpperRight;
-    private Vector2D jungleLowerLeft;
-    private int jungleWidth ;
-    private int jungleHeight;
-    private int width;
-    private int height;
+    public final Vector2D upperRight;
+    public final Vector2D lowerLeft;
+    public final Vector2D jungleUpperRight;
+    public final Vector2D jungleLowerLeft;
+    public final int jungleWidth;
+    public final int jungleHeight;
+    public final int width;
+    public final int height;
 
 
     //living
@@ -76,7 +76,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         this.jungleUpperRight = new Vector2D(jux, jux);
     }
 
-
+    // TODO: simplify if statements
     public Vector2D posCurve(Vector2D position){ //"connects" opposite edges of the map
         int newX;
         int newY;
@@ -213,7 +213,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         int toMuchTimes = 0;
         while ((double) toMuchTimes < (double) 2 * ((double) jungleSize / (double) steppeSize) * mapSize) {
 
-            Vector2D position = new Vector2D((int) (Math.random() * (jungleWidth) + jungleLowerLeft.x), (int) (Math.random() * (jungleHeight) + jungleLowerLeft.y));
+            Vector2D position = new Vector2D((int) (Math.random() * (jungleWidth) + jungleLowerLeft.x)
+                    , (int) (Math.random() * (jungleHeight) + jungleLowerLeft.y));
             if (canBePlaced(position)) {
                 place(new Animal(position, startEnergy, this));
                 return true;
@@ -371,5 +372,49 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         MapVisualizer mapVisualization = new MapVisualizer(this);
         return mapVisualization.draw(lowerLeft, upperRight);
     }
+
+
+    public LinkedList<Grass> getGrassList(){
+        return this.grassList;
+    }
+
+
+    public LinkedList<Animal> getAnimalsList(){
+        return this.animalList;
+    }
+
+    // TODO: remove?
+
+    /*public int getWidth(){
+        return this.width;
+    }
+
+    public int getHeight(){
+        return this.height;
+    }
+
+    public Vector2D getLowerLeft(){
+        return this.lowerLeft;
+    }
+
+    public Vector2D getUpperRight(){
+        return this.upperRight;
+    }
+
+    public Vector2D getJungleLowerLeft(){
+        return this.jungleLowerLeft;
+    }
+
+    public Vector2D getJungleUpperRight(){
+        return  this.jungleUpperRight;
+    }
+
+    public int getJungleWidth(){
+        return this.jungleWidth;
+    }
+
+    public int getJungleHeight(){
+        return this.jungleHeight;
+    }*/
 
 }
