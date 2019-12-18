@@ -60,7 +60,7 @@ public class Genes {
         for (int i = secondPlaceToDiv; i < size; i++)
             genes[i] = g1.getGenes()[i];
 
-        //REPAIR GENES, THERE IS A CHANCE THAT SOME GENS FROM RANGE AREN'T EXIST IN CHILD GENES
+        //REPAIR GENES, THERE IS A CHANCE THAT SOME GENS FROM RANGE DON'T EXIST IN CHILD GENES
         checkGenes();
     }
 
@@ -113,7 +113,7 @@ public class Genes {
 
 
     public int returnRandomGen() {
-        int rand = (int) (Math.random() * (size));
+        int rand = (int) (Math.random() * size);
         return genes[rand];
     }
 }

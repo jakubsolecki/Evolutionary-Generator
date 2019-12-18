@@ -7,7 +7,6 @@ import java.awt.*;
 
 public class Grass implements IWorldMapElement {
     private Vector2D position;
-    private int energy; //is it necessary?
 
     public Vector2D getPosition(){
         return position;
@@ -31,7 +30,6 @@ public class Grass implements IWorldMapElement {
     }
 
     public Color toColor() {
-        return new Color(67, 222, 31);
+        return new Color(0,160,7);
     }
-
 }

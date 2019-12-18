@@ -36,14 +36,14 @@ public class RenderPanel extends JPanel {
         this.height = this.getHeight();
         this.widthScale = width / map.width;
         this.heightScale = height / map.height;
-        this.setSize(frame.getWidth(), frame.getHeight() - 38);
-        //this.setLocation((int) (0.4 * frame.getWidth()), -20);
-        //setBackground(Color.black);
+        this.setSize((frame.getWidth() - 1), frame.getHeight() - 38);
+
+        //draw map
         g.setColor(new Color(170, 224, 103));
         g.fillRect(0, 0, this.width, this.height);
 
         //draw jungle
-        g.setColor(new Color(0, 160, 7));
+        g.setColor(new Color(67, 222, 31));
         g.fillRect(map.jungleLowerLeft.x * widthScale,
                 map.jungleLowerLeft.y * heightScale,
                 map.jungleWidth * widthScale,

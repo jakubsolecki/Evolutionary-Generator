@@ -32,6 +32,7 @@ public class Simulation {
         map.grandFeast();
         map.copulation();
         map.spawnGrass();
+        map.nextDay();
     }
 
     public void simulate() throws InterruptedException{
@@ -51,9 +52,10 @@ public class Simulation {
         for(int i = 1; i < totalDays; i++){
             this.nextDay();
             out.println("Day: " + currentDay);
-            out.println(map.toString());
+            //out.println(map.toString());
             renderPanel.repaint();
-            TimeUnit.MILLISECONDS.sleep(500);
+            currentDay++;
+            TimeUnit.MILLISECONDS.sleep(50);
         }
     }
 }

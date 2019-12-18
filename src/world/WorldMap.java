@@ -139,22 +139,12 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
                         if (parent2.getEnergy() > copulationEnergyLowerLimit) {
                             Animal child = parent2.copulation(parent1);
                             place(child);
-                            //System.out.println(child.getGenes().toString());
+                            System.out.println("Child was born");
                         }//statistic to end
                 }
             }
         }
     }
-
-
-    /*public Vector2D placeToBirth(Vector2D position){
-        for(MapDirection i : MapDirection.values()){
-            Vector2D birthPos = posCurve(MapDirection.toUnitVector(i).add(position));
-            if(canBePlaced(birthPos));
-                return birthPos;
-        }
-        return
-    }*/
 
 
     public void nextDay() {
@@ -169,6 +159,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         }
     }
 
+
     public void removeDeadAnimals() {
         LinkedList<Animal> l = animalList;
         for (int i = 0; i < l.size(); i++) {
@@ -181,8 +172,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         }
     }
 
-    public boolean addAnimalOnRandomField() {
 
+    public boolean addAnimalOnRandomField() {
         int toMuchTimes = 0;
         while (toMuchTimes < width * height * 2) {
             Vector2D position = new Vector2D((int) (Math.random() * (width) + lowerLeft.x), (int) (Math.random() * (height) + lowerLeft.y));
@@ -232,7 +223,6 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
                 grass.put(position, (Grass) entity);
             grassList.add((Grass) entity);
         }
-
         return true;
     }
 
@@ -292,20 +282,21 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
                     if(a.getEnergy() == maxEnergy)
                         mightyAnimals++;
 
-                for(Animal a : eatingAnimals)
-                    if(a.getEnergy() == maxEnergy)
+                for(Animal a : eatingAnimals) {
+                    if (a.getEnergy() == maxEnergy)
                         a.changeEnergy(grassEnergy / mightyAnimals);
+                }
+                willBeEaten.add(food);
             }
-            willBeEaten.add(food);
         }
         for(Grass g : willBeEaten){
-            grass.remove(g);
+            grass.remove(g.getPosition());
+            grassList.remove(g);
         }
     }
 
 
     public boolean positionChanged(Vector2D oldPosition2, Vector2D newPosition2, Object entity) {
-
         Vector2D oldPosition = posCurve(oldPosition2);
         Vector2D newPosition = posCurve(newPosition2);
 
@@ -320,13 +311,12 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
 
 
     public void spawnGrass() {
-
         //For Jungle
-
         int jungleSize = jungleWidth * jungleHeight;
         int mapSize = height * width;
         int steppeSize = mapSize - jungleSize;
         int toMuchTimes = 0;
+
         // stop looking for free place for grass in jungle, following to uniform probability distribution: after (size of jungle) times we should find free position
         //but if we didn't we can stop and meaning that jungle fields are close to be full of grass.
         while (toMuchTimes < 2 * jungleSize) {
@@ -341,7 +331,6 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         }
 
         //For Steppe
-
         toMuchTimes = 0;
         // stop looking for free place for grass in steppe, following to uniform probability distribution: after (size of steppe) times we should find free position
         //but if we didn't we can stop and be sure that steppe fields are close to be full of grass.
@@ -372,39 +361,4 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     public LinkedList<Animal> getAnimalsList(){
         return this.animalList;
     }
-
-    // TODO: remove?
-
-    /*public int getWidth(){
-        return this.width;
-    }
-
-    public int getHeight(){
-        return this.height;
-    }
-
-    public Vector2D getLowerLeft(){
-        return this.lowerLeft;
-    }
-
-    public Vector2D getUpperRight(){
-        return this.upperRight;
-    }
-
-    public Vector2D getJungleLowerLeft(){
-        return this.jungleLowerLeft;
-    }
-
-    public Vector2D getJungleUpperRight(){
-        return  this.jungleUpperRight;
-    }
-
-    public int getJungleWidth(){
-        return this.jungleWidth;
-    }
-
-    public int getJungleHeight(){
-        return this.jungleHeight;
-    }*/
-
 }
