@@ -25,28 +25,24 @@ public class RenderPanel extends JPanel {
         this.map = map;
         // this.simulation = simulation;
         this.frame = frame;
-        this.width = this.getWidth();
-        this.height = this.getHeight();
-        this.widthScale = width / map.width;
-        this.heightScale = height / map.height;
-        this.setSize((int) ((frame.getWidth()) * 0.6), frame.getHeight());
-        this.setLocation((int) (0.4 * frame.getWidth()), 0);
     }
 
 
     @Override
-    protected void paintComponent(Graphics g){
+    protected void paintComponent(Graphics gg){
+        Graphics2D g = (Graphics2D) gg;
         super.paintComponent(g);
-        setBackground(Color.black);
-        //g.setColor(Color.GREEN);
+        this.width = this.getWidth();
+        this.height = this.getHeight();
+        this.widthScale = width / map.width;
+        this.heightScale = height / map.height;
+        this.setSize(frame.getWidth(), frame.getHeight() - 38);
+        //this.setLocation((int) (0.4 * frame.getWidth()), -20);
+        //setBackground(Color.black);
         g.setColor(new Color(170, 224, 103));
-        g.fillRect(0, 0, width, height);
+        g.fillRect(0, 0, this.width, this.height);
 
-
-        //this.setLocation((int) (0.4 * frame.getWidth()), 0);
-
-
-
+        //draw jungle
         g.setColor(new Color(0, 160, 7));
         g.fillRect(map.jungleLowerLeft.x * widthScale,
                 map.jungleLowerLeft.y * heightScale,

@@ -51,19 +51,17 @@ public class Genes {
         }
 
         // FILLING GENES BY 2 PARTS OF FIRST PARENT'S DNA AND 1 PART OF SECOND PARENT'S DNA
-        for (int i = 0; i <= firstPlaceToDiv; i++) {
+        for (int i = 0; i <= firstPlaceToDiv; i++)
             genes[i] = g1.getGenes()[i];
-        }
-        for (int i = firstPlaceToDiv + 1; i <= secondPlaceToDiv; i++) {
+
+        for (int i = firstPlaceToDiv + 1; i <= secondPlaceToDiv; i++)
             genes[i] = g2.getGenes()[i];
-        }
-        for (int i = secondPlaceToDiv; i < size; i++) {
+
+        for (int i = secondPlaceToDiv; i < size; i++)
             genes[i] = g1.getGenes()[i];
-        }
 
         //REPAIR GENES, THERE IS A CHANCE THAT SOME GENS FROM RANGE AREN'T EXIST IN CHILD GENES
         checkGenes();
-
     }
 
 
@@ -86,8 +84,6 @@ public class Genes {
 
 
     private void checkGenes(){
-        // boolean[] flags = new boolean[8];
-        //int[] counter = new int[8];
         boolean flag = true;
 
         while (flag) {
@@ -97,8 +93,6 @@ public class Genes {
 
             for (int i = 0; i < size; i++)
                 flags[this.genes[i]] = true;
-
-            // System.out.println(this.genes.toString());
 
             for (int i = 0; i < numOfGenes; i++) {
                 if (!flags[i]) {

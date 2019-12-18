@@ -76,7 +76,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         this.jungleUpperRight = new Vector2D(jux, jux);
     }
 
-    // TODO: simplify if statements
+
     public Vector2D posCurve(Vector2D position){ //"connects" opposite edges of the map
         int newX;
         int newY;
@@ -87,16 +87,6 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
             newX = Math.abs(position.x % width);
 
         if(position.y < lowerLeft.y)
-            newY = (height - Math.abs(position.y % height) % height);
-        else
-            newY = Math.abs(position.y % height);
-
-        if(position.x > upperRight.x)
-            newX = (width - Math.abs(position.x % width)) % width;
-        else
-            newX = Math.abs(position.x % width);
-
-        if(position.y > upperRight.y)
             newY = (height - Math.abs(position.y % height) % height);
         else
             newY = Math.abs(position.y % height);
