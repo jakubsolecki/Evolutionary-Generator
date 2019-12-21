@@ -21,22 +21,6 @@ public class World {
         map.place(pet4);
         Simulation simulation = new Simulation(map, 10000);
         simulation.simulate();
-
-        /*System.out.println(pet.getPosition().toString());
-        System.out.println((Arrays.toString(pet.getGenes().getGenes())));
-
-
-        for(int i = 0; i < 100; i++){
-            System.out.println(map.toString());
-            map.removeDeadAnimals();
-            map.moveRandomAllAnimals();
-            map.grandFeast();
-            map.copulation();
-            map.spawnGrass();
-            map.nextDay();
-            Thread.sleep(200); // in milliseconds
-        }*/
-
     }
 
 }

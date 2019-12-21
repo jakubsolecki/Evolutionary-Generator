@@ -14,9 +14,6 @@ public class Genes {
         checkGenes();
     }
 
-    /* @Override dorobic toString dla tablicy genow (moze nawet cale wypisywanie
-    public String toString())*/
-
 
     public int[] getGenes(){
         return genes;
@@ -97,7 +94,7 @@ public class Genes {
             for (int i = 0; i < numOfGenes; i++) {
                 if (!flags[i]) {
                     flag = true;
-                   // break;
+                    break;
                 }
             }
 

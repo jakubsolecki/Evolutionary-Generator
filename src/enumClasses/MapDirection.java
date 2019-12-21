@@ -1,8 +1,25 @@
 package enumClasses;
+
 import classes.Vector2D;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public enum MapDirection {
     N, NE, E, SE, S, SW, W, NW;
+
+    private static final List<MapDirection> VALUES =
+            Collections.unmodifiableList(Arrays.asList(values()));
+    private static final int SIZE = VALUES.size();
+    private static final Random RANDOM = new Random();
+
+
+    public static MapDirection randomDirection() {
+        return VALUES.get(RANDOM.nextInt(SIZE));
+    }
+
 
     //@Override
     public static String toString(MapDirection directions){
@@ -26,27 +43,29 @@ public enum MapDirection {
             return null;
     }
 
-    public static MapDirection next(MapDirection t){
-        MapDirection n;
-        if(t == N)
-            n = NE;
-        else if(t == NE)
-            n = E;
-        else if(t == E)
-            n = SE;
-        else if(t == SE)
-            n = S;
-        else if(t == S)
-            n = SW;
-        else if(t == SW)
-            n = W;
-        else if(t == W)
-            n = NW;
-        else //if(direction == NW)
-            n = S;
 
-        return n;
+    public static MapDirection next(MapDirection t){
+        switch(t){
+            case N:
+                return NE;
+            case NE:
+                return E;
+            case E:
+                return SE;
+            case SE:
+                return S;
+            case S:
+                return SW;
+            case SW:
+                return W;
+            case W:
+                return NW;
+            case NW:
+                return N;
+        }
+        return t;
     }
+
 
     public static MapDirection previous(MapDirection t){
         //MapDirection n = t;
@@ -68,8 +87,9 @@ public enum MapDirection {
             case NW:
                 return W;
         }
-        return null;
+        return t;
     }
+
 
     public static Vector2D toUnitVector(MapDirection t){
         switch(t){
@@ -93,5 +113,4 @@ public enum MapDirection {
                 return new Vector2D(0,0);
         }
     }
-
 }

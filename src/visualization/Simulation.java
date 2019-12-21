@@ -37,7 +37,7 @@ public class Simulation {
 
     public void simulate() throws InterruptedException{
         out.println("Day: " + currentDay);
-        out.println(map.toString());
+        //out.println(map.toString());
         frame.setSize(500, 500);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

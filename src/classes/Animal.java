@@ -19,7 +19,7 @@ public class Animal implements IWorldMapElement{
 
 
     private Animal() {
-        this.direction = N;
+        this.direction = randomDirection();
         genes = new Genes(32, 8);
         position = new Vector2D(2, 2);
     }
@@ -83,23 +83,23 @@ public class Animal implements IWorldMapElement{
                 direction = previous(direction);
                 break;
             case RIGHT:
-                this.direction = next(direction);
+                direction = next(direction);
                 break;
             case FORWARD:
-                moved = this.position.add(map.posCurve(toUnitVector(this.direction)));
+                moved = position.add(map.posCurve(toUnitVector(direction)));
                 if(map.canMoveTo(moved)){
                     positionChanged(moved);
-                this.position = moved;
+                    position = moved;
                 }
                 break;
             case BACKWARD:
-                moved = this.position.subtract(map.posCurve(toUnitVector(this.direction)));
+                moved = position.subtract(map.posCurve(toUnitVector(direction)));
                 if(map.canMoveTo(moved)) {
                     positionChanged(moved);
-                    this.position = moved;
+                    position = moved;
 
-                    break;
                 }
+                break;
         }
     }
 
@@ -142,7 +142,7 @@ public class Animal implements IWorldMapElement{
 
     @Override
     public String toString() {
-        return energy == 0 ? "X" : "O"; //this.direction.toString();
+        return energy == 0 ? "X" : "O";
     }
 
 
