@@ -2,13 +2,15 @@ package visualization;
 
 import classes.Animal;
 import classes.Grass;
-import world.WorldMap;
+import map.WorldMap;
 import java.awt.*;
+import java.util.LinkedList;
 import javax.swing.*;
 
 public class RenderPanel extends JPanel {
     public WorldMap map;
-    public Simulation simulation;
+    LinkedList<Animal> animalsList;
+    LinkedList<Grass> grassList;
     public JFrame frame;
     private Image mapTexture;
     private Image jungleTexture;
@@ -23,8 +25,16 @@ public class RenderPanel extends JPanel {
 
     public RenderPanel(WorldMap map, JFrame frame) {
         this.map = map;
-        // this.simulation = simulation;
         this.frame = frame;
+        this.animalsList = map.getAnimalsList();
+        this.grassList = map.getGrassList();
+        this.setSize((int) (0.5 * (frame.getWidth())), frame.getHeight());
+        // this.setLocation((int) (0.4 * frame.getWidth()), 0);
+        width = this.getWidth();
+        height = this.getHeight();
+        this.widthScale = width / map.width;
+        this.heightScale = height / map.height;
+
     }
 
 
@@ -32,11 +42,7 @@ public class RenderPanel extends JPanel {
     protected void paintComponent(Graphics gg){
         Graphics2D g = (Graphics2D) gg;
         super.paintComponent(g);
-        this.width = this.getWidth();
-        this.height = this.getHeight();
-        this.widthScale = width / map.width;
-        this.heightScale = height / map.height;
-        this.setSize((frame.getWidth() - 1), frame.getHeight() - 38);
+
 
         //draw map
         g.setColor(new Color(170, 224, 103));
@@ -50,7 +56,7 @@ public class RenderPanel extends JPanel {
                 map.jungleHeight * heightScale);
 
         //draw grass
-        for (Grass grass : map.getGrassList()) {
+        for (Grass grass : grassList) {
             g.setColor(grass.toColor());
             int y = map.toProperPosition(grass.getPosition()).y * heightScale;
             int x = map.toProperPosition(grass.getPosition()).x * widthScale;
@@ -58,7 +64,7 @@ public class RenderPanel extends JPanel {
         }
 
         //draw Animals
-        for (Animal a : map.getAnimalsList()) {
+        for (Animal a : animalsList) {
             g.setColor(a.toColor());
             int y = map.toProperPosition(a.getPosition()).y * heightScale;
             int x = map.toProperPosition(a.getPosition()).x * widthScale;

@@ -1,13 +1,14 @@
-package world;
 //import classes.Animal;
 import classes.*;
 import visualization.Simulation;
+import map.WorldMap;
 
 // TODO: reading initial parameters from JSON file
+// TODO: move creating world to the Simulation
 public class World {
     public static void main(String[] args) throws InterruptedException {
-        WorldMap map = new WorldMap(40, 40, 10,
-                10, 5, 1, 50, 25);
+        WorldMap map = new WorldMap(50, 25, 25,
+                5, 1, 500, 25);
         Animal pet = new Animal(new Vector2D(11,11), 500, map);
         Animal pet2 = new Animal(new Vector2D(15, 20), 500, map);
         Animal pet3 = new Animal(new Vector2D(10,10), 500, map);

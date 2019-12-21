@@ -12,14 +12,16 @@ import static enumClasses.MapDirection.*;
 public class Animal implements IWorldMapElement{
     private Genes genes;
     private Vector2D position;
-    private int energy;private int startEnergy;
+    private int energy;
+    private int startEnergy;
     private MapDirection direction;
     private Set<IPositionChangeObserver> observers = new HashSet<>();
     private IWorldMap map;
+    private int age;
 
     // constructors
     private Animal() {
-        this.direction = getRandomDirection();
+        direction = getRandomDirection();
         genes = new Genes(32, 8);
         // TODO: remove or generate random vector
         position = new Vector2D(2, 2);
@@ -32,14 +34,14 @@ public class Animal implements IWorldMapElement{
 
     private Animal(IWorldMap map, Vector2D initialPosition) {
         this(map);
-        this.position = initialPosition;
+        position = initialPosition;
     }
 
     public Animal(Vector2D initialPosition, int energy, IWorldMap map) {
         this(map, initialPosition);
         this.energy = energy;
         this.startEnergy = energy;
-        genes = new Genes(32, 8);
+        age = 0;
     }
 
 
@@ -91,6 +93,11 @@ public class Animal implements IWorldMapElement{
     }
 
 
+    public void increaseAge(){
+        age++;
+    }
+
+
     public boolean isDead(){
         return energy == 0;
     }
@@ -125,7 +132,6 @@ public class Animal implements IWorldMapElement{
 
 
     // family of get- methods
-
     public Vector2D getPosition() {
         return new Vector2D(position.x, position.y);
     }
@@ -136,6 +142,10 @@ public class Animal implements IWorldMapElement{
 
     public Genes getGenes(){
         return genes;
+    }
+
+    public int getAge(){
+        return age;
     }
 
 

@@ -1,4 +1,4 @@
-package world;
+package map;
 import enumClasses.MoveDirection;
 import interfaces.*;
 import classes.*;
@@ -30,10 +30,11 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     private LinkedList<Animal> animalList;
     private LinkedList<Grass> grassList;
 
-    public WorldMap(int width, int height, int jungleWidth, int jungleHeight, int grassEnergy, int dayCost, int initialEnergy, int copulationEnergy){
+    public WorldMap(int widthAndHeight, int jungleWidth, int jungleHeight,
+                    int grassEnergy, int dayCost, int initialEnergy, int copulationEnergy){
         // map attributes
-        this.width = width;
-        this.height = height;
+        this.width = widthAndHeight;
+        this.height = widthAndHeight;
         lowerLeft = new Vector2D(0,0);
         upperRight = new Vector2D(width - 1, height - 1);
         this.grassEnergy = grassEnergy;
@@ -149,6 +150,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
                 if (animalList.size() > 0) {
                     for (Animal a : animalList) {
                         a.changeEnergy(energyDayDrain);
+                        a.increaseAge();
                     }
                 }
             }
