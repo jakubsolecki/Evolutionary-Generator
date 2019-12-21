@@ -1,8 +1,5 @@
 package interfaces;
 import classes.*;
-import enumClasses.*;
-
-import java.util.LinkedList;
 
 public interface IWorldMap {
 
@@ -13,7 +10,7 @@ public interface IWorldMap {
      *            The animal to place on the map.
      * @return True if the animal was placed. The animal cannot be placed if the map is already occupied.
      */
-    boolean place(IWorldMapElement entity);
+    boolean placeOnMap(IWorldMapElement entity);
 
 
     /**
@@ -30,5 +27,5 @@ public interface IWorldMap {
 
     boolean isOccupied(Vector2D currentPosition);
 
-    Vector2D posCurve(Vector2D toUnitVector);
+    Vector2D toProperPosition(Vector2D toUnitVector);
 }

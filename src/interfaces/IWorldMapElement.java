@@ -9,6 +9,5 @@ public interface IWorldMapElement {
     Vector2D getPosition();
 
     void addObserver(IPositionChangeObserver observer);
-
 }
 

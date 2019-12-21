@@ -52,16 +52,16 @@ public class RenderPanel extends JPanel {
         //draw grass
         for (Grass grass : map.getGrassList()) {
             g.setColor(grass.toColor());
-            int y = map.posCurve(grass.getPosition()).y * heightScale;
-            int x = map.posCurve(grass.getPosition()).x * widthScale;
+            int y = map.toProperPosition(grass.getPosition()).y * heightScale;
+            int x = map.toProperPosition(grass.getPosition()).x * widthScale;
             g.fillRect(x, y, widthScale, heightScale);
         }
 
         //draw Animals
         for (Animal a : map.getAnimalsList()) {
             g.setColor(a.toColor());
-            int y = map.posCurve(a.getPosition()).y * heightScale;
-            int x = map.posCurve(a.getPosition()).x * widthScale;
+            int y = map.toProperPosition(a.getPosition()).y * heightScale;
+            int x = map.toProperPosition(a.getPosition()).x * widthScale;
             g.fillOval(x, y, widthScale, heightScale);
         }
     }

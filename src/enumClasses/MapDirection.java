@@ -1,7 +1,6 @@
 package enumClasses;
 
 import classes.Vector2D;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -16,31 +15,8 @@ public enum MapDirection {
     private static final Random RANDOM = new Random();
 
 
-    public static MapDirection randomDirection() {
+    public static MapDirection getRandomDirection() {
         return VALUES.get(RANDOM.nextInt(SIZE));
-    }
-
-
-    //@Override
-    public static String toString(MapDirection directions){
-        if(directions == N)
-            return "N";
-        else if(directions == NE)
-            return "NE";
-        else if(directions == E)
-            return "E";
-        else if(directions == SE)
-            return "SE";
-        else if(directions == S)
-            return "S";
-        else if(directions == SW)
-            return "SW";
-        else if(directions == W)
-            return "W";
-        else if(directions == NW)
-            return "NW";
-        else
-            return null;
     }
 
 
@@ -65,7 +41,6 @@ public enum MapDirection {
         }
         return t;
     }
-
 
     public static MapDirection previous(MapDirection t){
         //MapDirection n = t;
@@ -112,5 +87,27 @@ public enum MapDirection {
             default:
                 return new Vector2D(0,0);
         }
+    }
+
+
+    public static String toString(MapDirection directions){
+        if(directions == N)
+            return "N";
+        else if(directions == NE)
+            return "NE";
+        else if(directions == E)
+            return "E";
+        else if(directions == SE)
+            return "SE";
+        else if(directions == S)
+            return "S";
+        else if(directions == SW)
+            return "SW";
+        else if(directions == W)
+            return "W";
+        else if(directions == NW)
+            return "NW";
+        else
+            return null;
     }
 }

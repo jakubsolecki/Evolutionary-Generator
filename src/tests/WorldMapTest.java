@@ -22,10 +22,10 @@ public class WorldMapTest {
         Animal pet4 = new Animal(new Vector2D(5,5), 20, map);
         Animal pet5 = new Animal(new Vector2D(5,5), 20, map);
 
-        assertTrue(map.place(pet));
-        assertTrue(map.place(pet2));
-        assertTrue(map.place(pet3));
-        assertTrue(map.place(pet4));
+        assertTrue(map.placeOnMap(pet));
+        assertTrue(map.placeOnMap(pet2));
+        assertTrue(map.placeOnMap(pet3));
+        assertTrue(map.placeOnMap(pet4));
        // assertTrue(map.place(pet5));
         System.out.println(pet.getPosition().toString());
         System.out.println((Arrays.toString(pet.getGenes().getGenes())));
@@ -37,7 +37,7 @@ public class WorldMapTest {
     void posCurveTest(){
         WorldMap map = new WorldMap(100, 30, 10, 10, 5, 1, 50, 25);
         Vector2D pos = new Vector2D(109, 100);
-        Vector2D curved = map.posCurve(pos);
+        Vector2D curved = map.toProperPosition(pos);
         out.println(curved.toString());
 
         Animal pet = new Animal(new Vector2D(5,5), 20, map);

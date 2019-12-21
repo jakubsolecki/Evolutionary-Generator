@@ -17,10 +17,11 @@ public class Animal implements IWorldMapElement{
     private Set<IPositionChangeObserver> observers = new HashSet<>();
     private IWorldMap map;
 
-
+    // constructors
     private Animal() {
-        this.direction = randomDirection();
+        this.direction = getRandomDirection();
         genes = new Genes(32, 8);
+        // TODO: remove or generate random vector
         position = new Vector2D(2, 2);
     }
 
@@ -34,7 +35,6 @@ public class Animal implements IWorldMapElement{
         this.position = initialPosition;
     }
 
-
     public Animal(Vector2D initialPosition, int energy, IWorldMap map) {
         this(map, initialPosition);
         this.energy = energy;
@@ -43,19 +43,44 @@ public class Animal implements IWorldMapElement{
     }
 
 
+    // moving animal
     @Override
     public boolean isMovable(){
         return true;
     }
 
+    public void move(MoveDirection toDirection) {
+        Vector2D moved;
+        switch (toDirection) {
+            case LEFT:
+                direction = previous(direction);
+                break;
+            case RIGHT:
+                direction = next(direction);
+                break;
+            case FORWARD:
+                moved = position.add(map.toProperPosition(toUnitVector(direction)));
+                if(map.canMoveTo(moved)){
+                    positionChanged(moved);
+                    position = moved;
+                }
+                break;
+            case BACKWARD:
+                moved = position.subtract(map.toProperPosition(toUnitVector(direction)));
+                if(map.canMoveTo(moved)) {
+                    positionChanged(moved);
+                    position = moved;
 
-    public Vector2D getPosition() {
-        return new Vector2D(position.x, position.y);
+                }
+                break;
+        }
     }
 
-
-    public int getEnergy(){
-        return energy;
+    public void rotate() {
+        int numOfRotation = genes.getRandomGen();
+        for (int i = 0; i < numOfRotation; i++) {
+            this.move(MoveDirection.RIGHT);
+        }
     }
 
 
@@ -71,53 +96,12 @@ public class Animal implements IWorldMapElement{
     }
 
 
-    public Genes getGenes(){
-        return genes;
-    }
-
-
-    public void move(MoveDirection toDirection) {
-        Vector2D moved;
-        switch (toDirection) {
-            case LEFT:
-                direction = previous(direction);
-                break;
-            case RIGHT:
-                direction = next(direction);
-                break;
-            case FORWARD:
-                moved = position.add(map.posCurve(toUnitVector(direction)));
-                if(map.canMoveTo(moved)){
-                    positionChanged(moved);
-                    position = moved;
-                }
-                break;
-            case BACKWARD:
-                moved = position.subtract(map.posCurve(toUnitVector(direction)));
-                if(map.canMoveTo(moved)) {
-                    positionChanged(moved);
-                    position = moved;
-
-                }
-                break;
-        }
-    }
-
-
-    public void rotate() {
-        int numOfRotation = genes.returnRandomGen();
-        for (int i = 0; i < numOfRotation; i++) {
-            this.move(MoveDirection.RIGHT);
-        }
-    }
-
-
-    public Animal copulation(Animal mother) {
-
+    public Animal copulate(Animal mother) {
         int childEnergy = (int) (0.25 * mother.energy) + (int) (this.energy * 0.25);
         mother.changeEnergy((int) -(0.25 * mother.energy));
         this.changeEnergy((int) -(this.energy * 0.25));
 
+        // child is placed on it's parents' position
         Animal child = new Animal(mother.getPosition(), childEnergy, map);
         child.genes = new Genes(this.genes, mother.genes);
 
@@ -125,26 +109,41 @@ public class Animal implements IWorldMapElement{
     }
 
 
+    // handling observers
     public void addObserver(IPositionChangeObserver observer){
         observers.add(observer);
     }
 
-
     public void removeObserver(IPositionChangeObserver observer){
         observers.remove(observer);
     }
-
 
     private void positionChanged(Vector2D newPosition){
         for(IPositionChangeObserver observer : observers)
             observer.positionChanged(this.getPosition(), newPosition, this);
     }
 
+
+    // family of get- methods
+
+    public Vector2D getPosition() {
+        return new Vector2D(position.x, position.y);
+    }
+
+    public int getEnergy(){
+        return energy;
+    }
+
+    public Genes getGenes(){
+        return genes;
+    }
+
+
+    // displaying
     @Override
     public String toString() {
         return energy == 0 ? "X" : "O";
     }
-
 
     public Color toColor() {
         if (energy == 0) return new Color(222, 221, 224);

@@ -1,5 +1,4 @@
 package world;
-import enumClasses.MapDirection;
 import enumClasses.MoveDirection;
 import interfaces.*;
 import classes.*;
@@ -19,20 +18,17 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     public final int width;
     public final int height;
 
-
     //living
     private int grassEnergy;
     private int energyDayDrain;
     private int startEnergy;
     private int copulationEnergyLowerLimit;
 
-
     //storing elements on map
     private Map<Vector2D, Grass> grass = new HashMap<>();
     private Map<Vector2D, LinkedList<Animal>> animals = new HashMap<>();
     private LinkedList<Animal> animalList;
     private LinkedList<Grass> grassList;
-
 
     public WorldMap(int width, int height, int jungleWidth, int jungleHeight, int grassEnergy, int dayCost, int initialEnergy, int copulationEnergy){
         // map attributes
@@ -55,7 +51,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         int jux = width - 1;
         int juy = height - 1;
 
-        //dynamic jungle moving to the center
+        //dynamic jungle positioning
         for (int i = 0; i < (width - jungleWidth); i++) {
             if (i % 2 == 0) {
                 jlx++;
@@ -63,7 +59,6 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
                 jux--;
             }
         }
-
         for (int i = 0; i < (height - jungleHeight); i++) {
             if (i % 2 == 0) {
                 jly++;
@@ -77,7 +72,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
-    public Vector2D posCurve(Vector2D position){ //"connects" opposite edges of the map
+    // changes vectors so that they in the map range
+    public Vector2D toProperPosition(Vector2D position){
         int newX;
         int newY;
 
@@ -96,17 +92,17 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
 
 
     private boolean canBePlaced(Vector2D position){
-        Vector2D mapPosition = posCurve(position);
+        Vector2D mapPosition = toProperPosition(position);
 
         if(animals.get(mapPosition) == null)
             return true;
 
+        // so that child can be placed on the parents' position
         return animals.get(mapPosition).size() < 3;
     }
 
-
     public boolean canMoveTo(Vector2D position){
-        Vector2D mapPosition = posCurve(position);
+        Vector2D mapPosition = toProperPosition(position);
 
         if(animals.get(mapPosition) == null)
             return true;
@@ -114,13 +110,12 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         return animals.get(mapPosition).size() < 2;
     }
 
-
     public boolean isOccupied(Vector2D position) {
         return objectAt(position) != null;
     }
 
 
-    public void moveRandomAllAnimals() {
+    public void moveAllAnimals() {
         LinkedList<Animal> l = animalList;
         for (int i = 0; i < l.size(); i++) {
             animalList.get(i).rotate();
@@ -129,7 +124,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
-    public void copulation() {
+    public void copulate() {
         for (LinkedList<Animal> animalList : animals.values()) {
             if (animalList != null) {
                 if (animalList.size() == 2) {
@@ -137,10 +132,11 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
                     Animal parent2 = animalList.get(1);
                     if (parent1.getEnergy() > copulationEnergyLowerLimit)
                         if (parent2.getEnergy() > copulationEnergyLowerLimit) {
-                            Animal child = parent2.copulation(parent1);
-                            place(child);
+                            Animal child = parent2.copulate(parent1);
+                            placeOnMap(child);
                             System.out.println("Child was born");
-                        }//statistic to end
+                        }
+                    // TODO: statistics
                 }
             }
         }
@@ -173,12 +169,14 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
+    // TODO: remove?
     public boolean addAnimalOnRandomField() {
         int toMuchTimes = 0;
         while (toMuchTimes < width * height * 2) {
-            Vector2D position = new Vector2D((int) (Math.random() * (width) + lowerLeft.x), (int) (Math.random() * (height) + lowerLeft.y));
+            Vector2D position = new Vector2D((int) (Math.random() * (width) + lowerLeft.x),
+                    (int) (Math.random() * (height) + lowerLeft.y));
             if (canBePlaced(position)) {
-                place(new Animal( position, startEnergy, this));
+                placeOnMap(new Animal( position, startEnergy, this));
                 return true;
             }
             toMuchTimes++;
@@ -186,6 +184,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         return false;
     }
 
+
+    // TODO: remove?
     public boolean placeAnimalToRandomFieldInJungle() {
         int jungleSize = jungleWidth * jungleHeight;
         int mapSize = height * width;
@@ -194,10 +194,10 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         int toMuchTimes = 0;
         while ((double) toMuchTimes < (double) 2 * ((double) jungleSize / (double) steppeSize) * mapSize) {
 
-            Vector2D position = new Vector2D((int) (Math.random() * (jungleWidth) + jungleLowerLeft.x)
-                    , (int) (Math.random() * (jungleHeight) + jungleLowerLeft.y));
+            Vector2D position = new Vector2D((int) (Math.random() * (jungleWidth) + jungleLowerLeft.x),
+                    (int) (Math.random() * (jungleHeight) + jungleLowerLeft.y));
             if (canBePlaced(position)) {
-                place(new Animal(position, startEnergy, this));
+                placeOnMap(new Animal(position, startEnergy, this));
                 return true;
             }
             toMuchTimes++;
@@ -206,8 +206,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
-    public boolean place(IWorldMapElement entity) {
-        Vector2D position = posCurve(entity.getPosition());
+    public boolean placeOnMap(IWorldMapElement entity) {
+        Vector2D position = toProperPosition(entity.getPosition());
 
         if(!canBePlaced(position))
             throw new IllegalArgumentException("Field" + position.toString() + "is already full");
@@ -218,6 +218,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
             entity.addObserver(this);
         }
 
+        // TODO: consider computeIfAbsent method
         if(entity instanceof Grass){
             if(grass.get(position) == null)
                 grass.put(position, (Grass) entity);
@@ -227,23 +228,25 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
+    // add animal to hash map
     private void addAnimal(Animal animal, Vector2D position){
         if(animal == null)
             return;
-        Vector2D mapPos = posCurve(position);
+        Vector2D mapPos = toProperPosition(position);
         LinkedList<Animal> list = animals.get(mapPos);
         if(list == null) {
             LinkedList<Animal> tmp = new LinkedList<>();
             tmp.add(animal);
             animals.put(mapPos, tmp);
         }
-        else // if(list != null)
+        else
             list.add(animal);
     }
 
 
+    // remove animal from hash map
     private void removeAnimal(Animal animal, Vector2D position){
-        Vector2D mapPos = posCurve(position);
+        Vector2D mapPos = toProperPosition(position);
         LinkedList<Animal> list = animals.get(mapPos);
         if(list == null || list.size() == 0)
             throw new IllegalArgumentException("Animal" + animal.getPosition() + "is not here");
@@ -256,7 +259,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
 
 
     public Object objectAt(Vector2D position) {
-        Vector2D mapPos = posCurve(position);
+        Vector2D mapPos = toProperPosition(position);
         LinkedList<Animal> list = animals.get(mapPos);
         if(list == null || list.size() == 0)
             return grass.get(mapPos);
@@ -264,12 +267,15 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
+    // eating
     public void grandFeast(){
         LinkedList<Grass> willBeEaten = new LinkedList<>();
 
         for(Grass food : grass.values()){
             LinkedList<Animal> eatingAnimals = animals.get(food.getPosition());
 
+            // TODO: consider sorting animals in the list by their energy
+            // but I can only have up to 3 animals on the same position
             if(eatingAnimals != null && eatingAnimals.size() > 0){
                 int maxEnergy = 0;
                 int mightyAnimals = 0;
@@ -296,12 +302,11 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
+    // informing observers about changing the position
     public boolean positionChanged(Vector2D oldPosition2, Vector2D newPosition2, Object entity) {
-        Vector2D oldPosition = posCurve(oldPosition2);
-        Vector2D newPosition = posCurve(newPosition2);
-
+        Vector2D oldPosition = toProperPosition(oldPosition2);
+        Vector2D newPosition = toProperPosition(newPosition2);
         if (canMoveTo(newPosition)) {
-
             removeAnimal((Animal) entity, oldPosition);
             addAnimal((Animal) entity, newPosition);
             return true;
@@ -311,34 +316,35 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
 
 
     public void spawnGrass() {
-        //For Jungle
+        // For jungle
         int jungleSize = jungleWidth * jungleHeight;
         int mapSize = height * width;
         int steppeSize = mapSize - jungleSize;
         int toMuchTimes = 0;
 
-        // stop looking for free place for grass in jungle, following to uniform probability distribution: after (size of jungle) times we should find free position
-        //but if we didn't we can stop and meaning that jungle fields are close to be full of grass.
+        // stop looking for free place for grass in jungle, following to uniform probability distribution:
+        // after (size of jungle) times we should find free position, but if we didn't we can stop and meaning
+        // that jungle fields are close to be full of grass.
         while (toMuchTimes < 2 * jungleSize) {
-
             //random position in jungle
             Vector2D newGrass = new Vector2D((int) (Math.random() * (jungleWidth) + jungleLowerLeft.x), (int) (Math.random() * (jungleHeight) + jungleLowerLeft.y));
             if (grass.get(newGrass) == null && canBePlaced(newGrass)) {
-                place(new Grass(newGrass));
+                placeOnMap(new Grass(newGrass));
                 break;
             }
             toMuchTimes++;
         }
 
-        //For Steppe
+        // For steppe
         toMuchTimes = 0;
-        // stop looking for free place for grass in steppe, following to uniform probability distribution: after (size of steppe) times we should find free position
-        //but if we didn't we can stop and be sure that steppe fields are close to be full of grass.
+        // stop looking for free place for grass in steppe, following to uniform probability distribution:
+        // after (size of steppe) times we should find free position but if we didn't we can stop and be sure
+        // that steppe fields are close to be full of grass.
         while ((double) toMuchTimes < (double) 2 * ((double) jungleSize / (double) steppeSize) * mapSize) {
-
+            //random position on steppe
             Vector2D newGrass = new Vector2D((int) (Math.random() * (width) + lowerLeft.x), (int) (Math.random() * (height) + lowerLeft.y));
             if (grass.get(newGrass) == null && canBePlaced(newGrass) && !(newGrass.follows(jungleLowerLeft) && newGrass.precedes(jungleUpperRight))) {
-                place(new Grass(newGrass));
+                placeOnMap(new Grass(newGrass));
                 break;
             }
             toMuchTimes++;
@@ -352,11 +358,9 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         return mapVisualization.draw(lowerLeft, upperRight);
     }
 
-
     public LinkedList<Grass> getGrassList(){
         return this.grassList;
     }
-
 
     public LinkedList<Animal> getAnimalsList(){
         return this.animalList;

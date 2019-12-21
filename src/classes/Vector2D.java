@@ -9,10 +9,6 @@ public class Vector2D {
         this.y = y;
     }
 
-    @Override
-    public String toString(){
-        return "(" + x + "," + y + ")";
-    }
 
     public boolean precedes(Vector2D other){
         return x <= other.x && y <= other.y;
@@ -22,6 +18,8 @@ public class Vector2D {
         return x >= other.x && y >= other.y;
     }
 
+
+    // TODO: consider removing
     public Vector2D upperRight(Vector2D other){
         int newX = Math.max(this.x, other.x);
         int newY = Math.max(this.y, other.y);
@@ -34,6 +32,7 @@ public class Vector2D {
         return new Vector2D(newX, newY);
     }
 
+
     public Vector2D add(Vector2D other){
         return new Vector2D(x + other.x, y + other.y);
     }
@@ -41,6 +40,7 @@ public class Vector2D {
     public Vector2D subtract(Vector2D other){
         return new Vector2D(x - other.x, y - other.y);
     }
+
 
     @Override
     public boolean equals(Object other){
@@ -52,11 +52,19 @@ public class Vector2D {
         return x == that.x && y == that.y;
     }
 
+
+    // required for hash map
     @Override
     public int hashCode() {
         int hash = 13;
         hash += this.x * 31;
         hash += this.y * 17;
         return hash;
+    }
+
+
+    @Override
+    public String toString(){
+        return "(" + x + "," + y + ")";
     }
 }

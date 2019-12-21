@@ -28,9 +28,9 @@ public class Simulation {
 
     public void nextDay(){
         map.removeDeadAnimals();
-        map.moveRandomAllAnimals();
+        map.moveAllAnimals();
         map.grandFeast();
-        map.copulation();
+        map.copulate();
         map.spawnGrass();
         map.nextDay();
     }

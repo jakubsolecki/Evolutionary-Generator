@@ -14,26 +14,22 @@ public class Genes {
         checkGenes();
     }
 
-
-    public int[] getGenes(){
-        return genes;
-    }
-
-
+    // TODO: remove?
     public Genes(Genes g) {
         this(g.getNumOfGenes(), g.getSize());
         genes = Arrays.copyOf(g.getGenes(), size);
     }
 
-
+    // constructor for child
     public Genes(Genes g1, Genes g2) {
         this(g1.getSize(), g1.getNumOfGenes());
         // this.numOfGenes = g1.getNumOfGenes();
         // this.size = g1.getSize();
 
-        if (g1.getSize() != g2.getSize()) throw new IllegalArgumentException("Gens have different sizes");
+        if (g1.getSize() != g2.getSize())
+            throw new IllegalArgumentException("Gens have different sizes"); // rather impossible, but you never know
         if (g1.getNumOfGenes() != g2.getNumOfGenes())
-            throw new IllegalArgumentException("Gens have different range of values");
+            throw new IllegalArgumentException("Gens have different range of values"); // same
 
         // random places to div DNA
         int firstPlaceToDiv = (int) (Math.random() * (size - 1));
@@ -62,16 +58,6 @@ public class Genes {
     }
 
 
-    public int getSize(){
-        return size;
-    }
-
-
-    public int getNumOfGenes(){
-        return this.numOfGenes;
-    }
-
-
     private void fillGenes(){
         for(int i = 0; i < size; i++){
             genes[i] = (int)(Math.random() * numOfGenes);
@@ -80,6 +66,7 @@ public class Genes {
     }
 
 
+    // verifying that there are all possible genes in one's genotype
     private void checkGenes(){
         boolean flag = true;
 
@@ -109,8 +96,23 @@ public class Genes {
     }
 
 
-    public int returnRandomGen() {
+    // family of get- methods
+    public int[] getGenes(){
+        return genes;
+    }
+
+    public int getRandomGen() {
         int rand = (int) (Math.random() * size);
         return genes[rand];
     }
+
+    public int getSize(){
+        return size;
+    }
+
+    public int getNumOfGenes(){
+        return this.numOfGenes;
+    }
+
+
 }
