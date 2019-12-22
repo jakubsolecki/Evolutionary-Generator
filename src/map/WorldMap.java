@@ -31,13 +31,13 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     private LinkedList<Animal> animalList;
     private LinkedList<Grass> grassList;
 
-    public WorldMap(int widthAndHeight, int jungleWidthAndHeight,
+    public WorldMap(int width, int height, int jungleWidth, int jungleHeight,
                     int grassEnergy, int dayCost, int initialEnergy, int copulationEnergy){
         random = new Random();
 
         // map attributes
-        this.width = widthAndHeight;
-        this.height = widthAndHeight;
+        this.width = width;
+        this.height = height;
         lowerLeft = new Vector2D(0,0);
         upperRight = new Vector2D(width - 1, height - 1);
         this.grassEnergy = grassEnergy;
@@ -46,8 +46,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         copulationEnergyLowerLimit = copulationEnergy;
         grassList = new LinkedList<>();
         animalList = new LinkedList<>();
-        this.jungleWidth = jungleWidthAndHeight;
-        this.jungleHeight = jungleWidthAndHeight;
+        this.jungleWidth = jungleWidth;
+        this.jungleHeight = jungleHeight;
 
         //jungle
         int jly = 0;
@@ -56,7 +56,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         int juy = height - 1;
 
         //dynamic jungle positioning
-        for (int i = 0; i < (width - jungleWidthAndHeight); i++) {
+        for (int i = 0; i < (width - jungleWidth); i++) {
             if (i % 2 == 0) {
                 jlx++;
             } else {

@@ -1,8 +1,10 @@
-package visualization;
+package simulation;
 
 import classes.Animal;
 import classes.Grass;
 import map.WorldMap;
+import visualization.RenderPanel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedList;
@@ -19,19 +21,24 @@ public class Simulation {
     private int energyOfGrass;
     private int animalsBornToday = 0;
     private int deadAnimalsToday = 0;
-    private final int cycleLength;
+    private int cycleLength;
+    private int firstAnimals;
 
 
 
-    public Simulation(int widthAndHeight, int jungleWidthAndHeight, int grassEnergy, int dayCost, int startEnergy,
-                      int copulationEnergy, int totalDays, int cycleLengthMilliseconds){
-        this.map = new WorldMap(widthAndHeight, jungleWidthAndHeight, grassEnergy, dayCost, startEnergy, copulationEnergy);
+    public Simulation(){
+        // this.map = new WorldMap(widthAndHeight, jungleWidthAndHeight, grassEnergy, dayCost, startEnergy, copulationEnergy);
+        JSONReader jsonParameters = new JSONReader();
+        this.map = new WorldMap(jsonParameters.width, jsonParameters.height, jsonParameters.jungleWidth,
+                jsonParameters.jungleHeight, jsonParameters.grassEnergy, jsonParameters.dayCost,
+                jsonParameters.startEnergy, jsonParameters.copulationEnergy);
         frame = new JFrame("Evolutionary Generator");
-        this.totalDays = totalDays;
+        this.totalDays = jsonParameters.totalDays;
         currentDay = 0;
-        this.dayCost = dayCost;
-        this.energyOfGrass = grassEnergy;
-        this.cycleLength = cycleLengthMilliseconds;
+        this.dayCost = jsonParameters.dayCost;
+        this.energyOfGrass = jsonParameters.grassEnergy;
+        this.cycleLength = jsonParameters.cycleLengthMilliseconds;
+        this.firstAnimals = jsonParameters.firstAnimals;
     }
 
 
@@ -46,14 +53,14 @@ public class Simulation {
 
 
     // Core of the simulation
-    public void simulate(int firstAnimals) throws InterruptedException{
+    public void simulate() throws InterruptedException{
         LinkedList<Animal> animalsList = map.getAnimalsList();
         LinkedList<Grass> grassList = map.getGrassList();
         float avgEnergy = 0;
         float avgAge = 0;
 
         // frame.setResizable( false );
-        frame.setSize(1000, 500);
+        frame.setSize(960, 540);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         RenderPanel renderPanel = new RenderPanel(map, frame);

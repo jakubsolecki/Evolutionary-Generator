@@ -1,0 +1,13 @@
+{
+  "width": 40,
+  "height": 40,
+  "jungleWidth": 20,
+  "jungleHeight": 20,
+  "firstAnimals": 20,
+  "dayCost": 1,
+  "startEnergy": 1000,
+  "copulationEnergy": 100,
+  "totalDays": 10000,
+  "grassEnergy": 5,
+  "cycleLengthMilliseconds":  50
+}
