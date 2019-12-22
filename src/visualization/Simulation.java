@@ -15,62 +15,66 @@ public class Simulation {
     public int currentDay;
     public int totalDays;
     public JFrame frame;
+    private int dayCost;
+    private int energyOfGrass;
+    private int animalsBornToday = 0;
+    private int deadAnimalsToday = 0;
+    private final int cycleLength;
 
 
-    public Simulation(WorldMap map, int totalDays){
-        this.map = map;
+
+    public Simulation(int widthAndHeight, int jungleWidthAndHeight, int grassEnergy, int dayCost, int startEnergy,
+                      int copulationEnergy, int totalDays, int cycleLengthMilliseconds){
+        this.map = new WorldMap(widthAndHeight, jungleWidthAndHeight, grassEnergy, dayCost, startEnergy, copulationEnergy);
         frame = new JFrame("Evolutionary Generator");
         this.totalDays = totalDays;
         currentDay = 0;
+        this.dayCost = dayCost;
+        this.energyOfGrass = grassEnergy;
+        this.cycleLength = cycleLengthMilliseconds;
     }
 
 
     public void nextDay(){
-        map.removeDeadAnimals();
+        deadAnimalsToday = map.removeDeadAnimals();
         map.moveAllAnimals();
         map.grandFeast();
-        map.copulate();
+        animalsBornToday = map.copulate();
         map.spawnGrass();
         map.nextDay();
     }
 
 
-    // Core of the simulation. Everything happens here.
-    public void simulate() throws InterruptedException{
+    // Core of the simulation
+    public void simulate(int firstAnimals) throws InterruptedException{
         LinkedList<Animal> animalsList = map.getAnimalsList();
         LinkedList<Grass> grassList = map.getGrassList();
-        //int animalsCounter = animalsList.size();
         float avgEnergy = 0;
         float avgAge = 0;
-        int children = 0;
 
         // frame.setResizable( false );
         frame.setSize(1000, 500);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         RenderPanel renderPanel = new RenderPanel(map, frame);
-        // renderPanel.setSize(new Dimension(1, 1));
         frame.add(renderPanel);
         frame.setVisible(true);
-        frame.setLayout(new GridLayout());
+        frame.setLayout(new GridLayout(1,2, 5,0));
 
         JPanel infoPanel = new JPanel();
         JLabel mapSize = new JLabel("Map size (W x H): " + map.width + " x " + map.height);
-        // TODO: add values below
-        JLabel initialPopulation = new JLabel("Initial population: ");
-        JLabel dayDrain = new JLabel("Daily energy drain: ");
-        JLabel grassEnergy = new JLabel("Grass energy: ");
-
+        JLabel initialPopulation = new JLabel("Initial population: " + firstAnimals);
+        JLabel dayDrain = new JLabel("Daily energy drain: " + dayCost);
+        JLabel grassEnergy = new JLabel("Grass energy: " + energyOfGrass);
         JLabel day = new JLabel("Day: " + this.currentDay);
         JLabel animalCounter = new JLabel("Animals on map: " + animalsList.size());
         JLabel grassCounter = new JLabel("Plants on map: " + grassList.size());
         JLabel averageAge = new JLabel("Average animal age: " + avgAge);
         JLabel averageEnergy = new JLabel("Average animal energy: " + avgEnergy);
-        // TODO: implement counting born and dead animals
-        // JLabel animalsBorn = new JLabel("Animals born this day: " + children);
-        // JLabel deadAnimals = new JLabel("Dead animals today: ");
+        JLabel animalsBorn = new JLabel("Animals born this day: " + animalsBornToday);
+        JLabel deadAnimals = new JLabel("Dead animals today: " + deadAnimalsToday);
 
-        infoPanel.setSize((int) (0.4 * frame.getWidth()), frame.getHeight());
+        infoPanel.setSize((int) (0.5 * frame.getWidth()), frame.getHeight());
         infoPanel.add(mapSize);
         infoPanel.add(initialPopulation);
         infoPanel.add(dayDrain);
@@ -80,12 +84,19 @@ public class Simulation {
         infoPanel.add(grassCounter);
         infoPanel.add(averageAge);
         infoPanel.add(averageEnergy);
-        infoPanel.setLayout(new GridLayout(10, 1));
+        infoPanel.add(animalsBorn);
+        infoPanel.add(deadAnimals);
+        infoPanel.setLayout(new GridLayout(11, 1));
         infoPanel.setVisible(true);
 
         frame.add(infoPanel);
 
         out.println("Simulation has begun.");
+
+        // placing first animals randomly
+        for(int i = 0; i < firstAnimals; i++)
+            map.randomPlacingInJungle();
+
         TimeUnit.SECONDS.sleep(1);
 
         for(int i = 0; i < totalDays; i++){
@@ -118,8 +129,12 @@ public class Simulation {
             averageAge.setText("Average animal age: " + String.format("%.2f", avgAge));
             out.println("Average animal energy: " + String.format("%.2f", avgEnergy));
             averageEnergy.setText("Average animal energy: " + String.format("%.2f", avgEnergy));
+            out.println("Animals born this day: " + animalsBornToday);
+            animalsBorn.setText("Animals born this day: " + animalsBornToday);
+            out.println("Dead animals today: " + deadAnimalsToday);
+            deadAnimals.setText("Dead animals today: " + deadAnimalsToday);
             renderPanel.repaint();
-            TimeUnit.MILLISECONDS.sleep(50);
+            TimeUnit.MILLISECONDS.sleep(cycleLength);
 
             this.nextDay();
             currentDay++;

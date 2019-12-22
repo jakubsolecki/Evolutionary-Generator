@@ -19,7 +19,6 @@ public class Vector2D {
     }
 
 
-    // TODO: consider removing
     public Vector2D upperRight(Vector2D other){
         int newX = Math.max(this.x, other.x);
         int newY = Math.max(this.y, other.y);

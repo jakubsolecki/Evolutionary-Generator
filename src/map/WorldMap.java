@@ -1,10 +1,10 @@
 package map;
+
 import enumClasses.MoveDirection;
 import interfaces.*;
 import classes.*;
 import classes.Animal;
 import visualization.MapVisualizer;
-
 import java.util.*;
 
 public class WorldMap implements IWorldMap, IPositionChangeObserver{
@@ -17,6 +17,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     public final int jungleHeight;
     public final int width;
     public final int height;
+    private Random random;
 
     //living
     private int grassEnergy;
@@ -30,8 +31,10 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     private LinkedList<Animal> animalList;
     private LinkedList<Grass> grassList;
 
-    public WorldMap(int widthAndHeight, int jungleWidth, int jungleHeight,
+    public WorldMap(int widthAndHeight, int jungleWidthAndHeight,
                     int grassEnergy, int dayCost, int initialEnergy, int copulationEnergy){
+        random = new Random();
+
         // map attributes
         this.width = widthAndHeight;
         this.height = widthAndHeight;
@@ -43,8 +46,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         copulationEnergyLowerLimit = copulationEnergy;
         grassList = new LinkedList<>();
         animalList = new LinkedList<>();
-        this.jungleWidth = jungleWidth;
-        this.jungleHeight = jungleHeight;
+        this.jungleWidth = jungleWidthAndHeight;
+        this.jungleHeight = jungleWidthAndHeight;
 
         //jungle
         int jly = 0;
@@ -53,7 +56,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         int juy = height - 1;
 
         //dynamic jungle positioning
-        for (int i = 0; i < (width - jungleWidth); i++) {
+        for (int i = 0; i < (width - jungleWidthAndHeight); i++) {
             if (i % 2 == 0) {
                 jlx++;
             } else {
@@ -125,7 +128,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
-    public void copulate() {
+    public int copulate() {
+        int childrenBornToady = 0;
         for (LinkedList<Animal> animalList : animals.values()) {
             if (animalList != null) {
                 if (animalList.size() == 2) {
@@ -135,12 +139,13 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
                         if (parent2.getEnergy() > copulationEnergyLowerLimit) {
                             Animal child = parent2.copulate(parent1);
                             placeOnMap(child);
+                            childrenBornToady++;
                             System.out.println("Child was born");
                         }
-                    // TODO: statistics
                 }
             }
         }
+        return childrenBornToady;
     }
 
 
@@ -158,7 +163,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
-    public void removeDeadAnimals() {
+    public int removeDeadAnimals() {
+        int deadAnimals  = 0;
         LinkedList<Animal> l = animalList;
         for (int i = 0; i < l.size(); i++) {
             Animal a = animalList.get(i);
@@ -166,47 +172,45 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
                 removeAnimal(a, a.getPosition());
                 a.removeObserver(this);
                 animalList.remove(a);
+                deadAnimals++;
             }
         }
+        return deadAnimals;
     }
 
 
-    // TODO: remove?
-    public boolean addAnimalOnRandomField() {
+    //placing animals on map
+    public void randomPlacingOnMap() {
         int toMuchTimes = 0;
         while (toMuchTimes < width * height * 2) {
-            Vector2D position = new Vector2D((int) (Math.random() * (width) + lowerLeft.x),
-                    (int) (Math.random() * (height) + lowerLeft.y));
+            Vector2D position = new Vector2D(random.nextInt(width) + lowerLeft.x,
+                    random.nextInt(height) + lowerLeft.y);
             if (canBePlaced(position)) {
                 placeOnMap(new Animal( position, startEnergy, this));
-                return true;
+                return;
             }
             toMuchTimes++;
         }
-        return false;
+        // return false;
     }
 
-
-    // TODO: remove?
-    public boolean placeAnimalToRandomFieldInJungle() {
+    public void randomPlacingInJungle() {
         int jungleSize = jungleWidth * jungleHeight;
         int mapSize = height * width;
         int steppeSize = mapSize - jungleSize;
 
         int toMuchTimes = 0;
         while ((double) toMuchTimes < (double) 2 * ((double) jungleSize / (double) steppeSize) * mapSize) {
-
-            Vector2D position = new Vector2D((int) (Math.random() * (jungleWidth) + jungleLowerLeft.x),
-                    (int) (Math.random() * (jungleHeight) + jungleLowerLeft.y));
+            Vector2D position = new Vector2D(random.nextInt(jungleWidth) + jungleLowerLeft.x,
+                    random.nextInt(jungleHeight) + jungleLowerLeft.y);
             if (canBePlaced(position)) {
                 placeOnMap(new Animal(position, startEnergy, this));
-                return true;
+                return;
             }
             toMuchTimes++;
         }
-        return false;
+        // return false;
     }
-
 
     public boolean placeOnMap(IWorldMapElement entity) {
         Vector2D position = toProperPosition(entity.getPosition());
@@ -220,10 +224,9 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
             entity.addObserver(this);
         }
 
-        // TODO: consider computeIfAbsent method
+
         if(entity instanceof Grass){
-            if(grass.get(position) == null)
-                grass.put(position, (Grass) entity);
+            grass.computeIfAbsent(position, k -> (Grass) entity);
             grassList.add((Grass) entity);
         }
         return true;
@@ -276,8 +279,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         for(Grass food : grass.values()){
             LinkedList<Animal> eatingAnimals = animals.get(food.getPosition());
 
-            // TODO: consider sorting animals in the list by their energy
-            // but I can only have up to 3 animals on the same position
+
             if(eatingAnimals != null && eatingAnimals.size() > 0){
                 int maxEnergy = 0;
                 int mightyAnimals = 0;
@@ -304,7 +306,7 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
     }
 
 
-    // informing observers about changing the position
+    // map is being informed about animal's position change
     public boolean positionChanged(Vector2D oldPosition2, Vector2D newPosition2, Object entity) {
         Vector2D oldPosition = toProperPosition(oldPosition2);
         Vector2D newPosition = toProperPosition(newPosition2);
@@ -329,7 +331,8 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         // that jungle fields are close to be full of grass.
         while (toMuchTimes < 2 * jungleSize) {
             //random position in jungle
-            Vector2D newGrass = new Vector2D((int) (Math.random() * (jungleWidth) + jungleLowerLeft.x), (int) (Math.random() * (jungleHeight) + jungleLowerLeft.y));
+            Vector2D newGrass = new Vector2D(random.nextInt(jungleWidth) + jungleLowerLeft.x,
+                    random.nextInt(jungleHeight) + jungleLowerLeft.y);
             if (grass.get(newGrass) == null && canBePlaced(newGrass)) {
                 placeOnMap(new Grass(newGrass));
                 break;
@@ -344,8 +347,10 @@ public class WorldMap implements IWorldMap, IPositionChangeObserver{
         // that steppe fields are close to be full of grass.
         while ((double) toMuchTimes < (double) 2 * ((double) jungleSize / (double) steppeSize) * mapSize) {
             //random position on steppe
-            Vector2D newGrass = new Vector2D((int) (Math.random() * (width) + lowerLeft.x), (int) (Math.random() * (height) + lowerLeft.y));
-            if (grass.get(newGrass) == null && canBePlaced(newGrass) && !(newGrass.follows(jungleLowerLeft) && newGrass.precedes(jungleUpperRight))) {
+            Vector2D newGrass = new Vector2D(random.nextInt(width) + lowerLeft.x,
+                    random.nextInt(height) + lowerLeft.y);
+            if (grass.get(newGrass) == null && canBePlaced(newGrass) && !(newGrass.follows(jungleLowerLeft)
+                    && newGrass.precedes(jungleUpperRight))) {
                 placeOnMap(new Grass(newGrass));
                 break;
             }

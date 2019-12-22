@@ -27,8 +27,6 @@ public class Grass implements IWorldMapElement {
         return;
     }
 
-    // TODO: add removeObsever
-
 
     // displaying
     @Override
@@ -37,6 +35,6 @@ public class Grass implements IWorldMapElement {
     }
 
     public Color toColor() {
-        return new Color(0,160,7);
+        return new Color(0, 133,7);
     }
 }

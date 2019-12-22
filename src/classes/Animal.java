@@ -1,7 +1,7 @@
 package classes;
+
 import enumClasses.MoveDirection;
 import enumClasses.MapDirection;
-
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,8 +23,6 @@ public class Animal implements IWorldMapElement{
     private Animal() {
         direction = getRandomDirection();
         genes = new Genes(32, 8);
-        // TODO: remove or generate random vector
-        position = new Vector2D(2, 2);
     }
 
     private Animal(IWorldMap map) {

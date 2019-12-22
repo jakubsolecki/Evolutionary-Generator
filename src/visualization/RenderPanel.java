@@ -2,8 +2,10 @@ package visualization;
 
 import classes.Animal;
 import classes.Grass;
+import classes.Vector2D;
 import map.WorldMap;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import javax.swing.*;
 
@@ -28,12 +30,12 @@ public class RenderPanel extends JPanel {
         this.frame = frame;
         this.animalsList = map.getAnimalsList();
         this.grassList = map.getGrassList();
-        this.setSize((int) (0.5 * (frame.getWidth())), frame.getHeight());
-        // this.setLocation((int) (0.4 * frame.getWidth()), 0);
+        this.setSize((int) (0.5 * (frame.getWidth())) , (int)  ( 0.95 * frame.getHeight()));
         width = this.getWidth();
         height = this.getHeight();
-        this.widthScale = width / map.width;
-        this.heightScale = height / map.height;
+        this.widthScale = Math.round(width / map.width);
+        this.heightScale = Math.round(height / map.height);
+        this.setBorder(BorderFactory.createLineBorder(Color.black));
 
     }
 
@@ -43,13 +45,12 @@ public class RenderPanel extends JPanel {
         Graphics2D g = (Graphics2D) gg;
         super.paintComponent(g);
 
-
         //draw map
-        g.setColor(new Color(170, 224, 103));
-        g.fillRect(0, 0, this.width, this.height);
+        g.setColor(new Color(216, 185, 0));
+        g.fillRect(0, 0, map.width * widthScale, map.height * heightScale);
 
         //draw jungle
-        g.setColor(new Color(67, 222, 31));
+        g.setColor(new Color(89, 177, 28));
         g.fillRect(map.jungleLowerLeft.x * widthScale,
                 map.jungleLowerLeft.y * heightScale,
                 map.jungleWidth * widthScale,

@@ -14,11 +14,6 @@ public class Genes {
         checkGenes();
     }
 
-    // TODO: remove?
-    public Genes(Genes g) {
-        this(g.getNumOfGenes(), g.getSize());
-        genes = Arrays.copyOf(g.getGenes(), size);
-    }
 
     // constructor for child
     public Genes(Genes g1, Genes g2) {
